@@ -8,8 +8,8 @@ import java.awt.Graphics2D;
  */
 public interface Engine {
 
-	public void initialize();
-	public void updateGame(UpdateInfo info);
-	
-	public void renderGame(Graphics2D g, RenderInfo info);
+    public void initialize();
+    public void updateGame(UpdateInfo info);
+    
+    public void renderGame(Graphics2D g, RenderInfo info);
 }
