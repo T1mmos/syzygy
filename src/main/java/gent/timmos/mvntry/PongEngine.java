@@ -8,7 +8,7 @@ public class PongEngine implements Engine {
 
     private int x100 = 0;
     
-    private static final int SPEED = 20; // pixels per second
+    private static final int SPEED = 40; // pixels per second
     
     public PongEngine (){
         
