@@ -19,6 +19,7 @@ public class App implements Runnable {
         SwingUtilities.invokeLater(new App());
     }
 
+    @Override
     public void run() {
         JFrame frame = new JFrame ("3D engine");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

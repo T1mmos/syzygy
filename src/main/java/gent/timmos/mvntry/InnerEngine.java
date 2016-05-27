@@ -39,7 +39,9 @@ public final class InnerEngine {
 
         @Override
         public void run() {
+            
             long time = System.currentTimeMillis();
+            final long time_start = time;
             engine.initialize();
             while (!Thread.currentThread().isInterrupted()) {
                 do {
@@ -62,7 +64,7 @@ public final class InnerEngine {
                 long time2 = System.currentTimeMillis();
                 long dt = time2 - time;
                 int fps = (int) (dt == 0 ? 1000 : 1000 / dt);
-                UpdateInfo info = new UpdateInfo(time, time2, dt, fps);
+                UpdateInfo info = new UpdateInfo(time, time2, dt, time2 - time_start, fps);
                 
                 time = time2;
                 
