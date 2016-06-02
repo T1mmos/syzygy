@@ -18,7 +18,7 @@ import javax.swing.WindowConstants;
 public class App implements Runnable {
     
     private App (){
-        
+         
     }
     
     public static void main(String[] args) {
