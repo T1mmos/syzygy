@@ -2,6 +2,7 @@ package gent.timmos.mvntry.math3d;
 
 import org.junit.Assert;
 
+import gent.timdemey.syzygy.math3d.MatrixOps;
 import junit.framework.TestCase;
 
 public class MatrixOpsTest extends TestCase {

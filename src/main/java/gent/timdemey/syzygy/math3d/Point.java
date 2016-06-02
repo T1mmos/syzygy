@@ -1,4 +1,4 @@
-package gent.timmos.mvntry.math3d;
+package gent.timdemey.syzygy.math3d;
 
 public class Point {
     
