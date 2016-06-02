@@ -12,18 +12,24 @@ public final class InnerEngine {
     private final BufferStrategy strategy;
     private final Engine engine;
     
+    private final InternalKeyListener keyL;
+    
     private Thread thread = null;
     
     public InnerEngine (JFrame frame, BufferStrategy strategy, Engine engine){
         this.frame = frame;
         this.strategy = strategy;
         this.engine = engine;
+        
+        this.keyL = new InternalKeyListener(KeyMapper.INSTANCE);
     }
     
     public synchronized void start (){
         if (thread != null){
             throw new IllegalStateException("Engine already running");
         }
+        
+        frame.addKeyListener(keyL);
         thread = new Thread (new InternalEngine(), "Engine");
         thread.start();
     }
@@ -33,6 +39,7 @@ public final class InnerEngine {
             thread.interrupt();
             thread = null;
         }
+        frame.removeKeyListener(keyL);
     }
     
     private class InternalEngine implements Runnable {
@@ -40,8 +47,8 @@ public final class InnerEngine {
         @Override
         public void run() {
             
-            long time = System.currentTimeMillis();
-            final long time_start = time;
+            long prevtime = System.currentTimeMillis();
+            final long time_start = prevtime;
             engine.initialize();
             while (!Thread.currentThread().isInterrupted()) {
                 do {
@@ -61,12 +68,21 @@ public final class InnerEngine {
                     Thread.interrupted();
                     break;
                 }
-                long time2 = System.currentTimeMillis();
-                long dt = time2 - time;
+                long currtime = System.currentTimeMillis();
+                long dt = currtime - prevtime;
                 int fps = (int) (dt == 0 ? 1000 : 1000 / dt);
-                UpdateInfo info = new UpdateInfo(time, time2, dt, time2 - time_start, fps);
                 
-                time = time2;
+                UpdateInfo.Builder builder = new UpdateInfo.Builder();
+                {
+                    builder.setPreviousTime(prevtime);
+                    builder.setCurrentTime(currtime);
+                    builder.setDiffTime(dt);
+                    builder.setPassedTime(currtime - time_start);
+                    builder.setFPS(fps);
+                    keyL.setPressedKeys(builder);
+                }
+                UpdateInfo info = builder.build();
+                prevtime = currtime;
                 
                 engine.updateGame(info);
             }

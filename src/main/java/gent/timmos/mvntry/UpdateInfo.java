@@ -1,17 +1,104 @@
 package gent.timmos.mvntry;
 
-public class UpdateInfo {
-    public final long prevTime;
-    public final long currTime;
-    public final long diffTime;
-    public final int currFPS;
-    public final long passedTime;
+public final class UpdateInfo {
     
-    UpdateInfo (long prevTime, long currTime, long diffTime, long passedTime, int currFPS){
-        this.prevTime = prevTime;
-        this.currTime = currTime;
-        this.diffTime = diffTime;
-        this.passedTime = passedTime;
-        this.currFPS = currFPS;
+    private long prevTime = Long.MIN_VALUE;
+    private long currTime = Long.MIN_VALUE;
+    private long diffTime = Long.MIN_VALUE;
+    private long passedTime = Long.MIN_VALUE;
+    
+    private int currFPS = 0;
+    
+    private long keymask = 0;
+    
+    private UpdateInfo (){
+    }
+    
+    public long getPreviousTime () {
+        return prevTime;
+    }
+    
+    public long getCurrentTime () {
+        return currTime;
+    }
+    
+    public long getDiffTime () {
+        return diffTime;
+    }
+    
+    public long getPassedTime () {
+        return passedTime;
+    }
+    
+    public int getFPS () {
+        return currFPS;
+    }
+    
+    /**
+     * Gets all input abstractions in the current frame as a bitmask. 
+     * The bit position for each abstraction is defined by the 
+     * ordinal number of each {@link Input} instance.
+     * <p>The method {@link #isInputActive(Input)} is more convenient to use.
+     * @return
+     */
+    public long getInputMask () {
+        return keymask;
+    }
+    
+    /**
+     * Checks whether the user's input triggers the specified action, and returns
+     * {@code true} when it is. 
+     * @param input
+     * @return
+     */
+    public boolean isInputActive (Input input) {
+        return (getInputMask() & input.getBitMask()) != 0; 
+    }
+    
+    public static final class Builder {
+        
+        private boolean built = false;
+        private final UpdateInfo info;
+        
+        public Builder () {
+            this.info = new UpdateInfo();
+        }
+        
+        public void setPreviousTime (long time) {
+            assert !built;
+            info.prevTime = time;
+        }
+        
+        public void setCurrentTime (long time) {
+            assert !built;
+            info.currTime = time;
+        }
+        
+        public void setDiffTime (long time) {
+            assert !built;
+            info.diffTime = time;
+        }
+        
+        public void setPassedTime (long time) {
+            assert !built;
+            info.passedTime = time;
+        }
+        
+        public void setFPS (int fps) {
+            assert !built;
+            info.currFPS = fps;
+        }
+        
+        public void setKeyMask (long mask) {
+            assert !built;
+            info.keymask = mask;
+        }
+        
+        public UpdateInfo build () {            
+            built = true;            
+            return info;
+        }
+        
+        
     }
 }

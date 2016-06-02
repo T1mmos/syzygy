@@ -27,7 +27,7 @@ public class App implements Runnable {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         
-        Engine engine = new PongEngine();
+        Engine engine = new _2DEngine();
         
         frame.createBufferStrategy(2);
         BufferStrategy strategy = frame.getBufferStrategy();
