@@ -1,10 +1,14 @@
 package gent.timmos.mvntry;
 
 public enum Input {
+    UP, 
+    DOWN,
+    LEFT,
+    RIGHT,
     FORWARD,
     BACKWARD,
-    STRAFE_RIGHT,
     STRAFE_LEFT,
+    STRAFE_RIGHT,
     SPEED_BOOSTER;
     
     public long getBitMask () {

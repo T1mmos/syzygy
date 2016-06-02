@@ -16,6 +16,5 @@ public class MatrixUtils {
             }
             builder.append("]\n");            
         }
-        System.out.println(builder.toString());
     }
 }

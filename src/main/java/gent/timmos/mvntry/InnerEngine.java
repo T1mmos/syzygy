@@ -1,14 +1,13 @@
 package gent.timmos.mvntry;
 
+import java.awt.Canvas;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
 
-import javax.swing.JFrame;
-
 public final class InnerEngine {
     
-    private final JFrame frame;
+    private final Canvas canvas;
     private final BufferStrategy strategy;
     private final Engine engine;
     
@@ -16,8 +15,8 @@ public final class InnerEngine {
     
     private Thread thread = null;
     
-    public InnerEngine (JFrame frame, BufferStrategy strategy, Engine engine){
-        this.frame = frame;
+    public InnerEngine (Canvas canvas, BufferStrategy strategy, Engine engine){
+        this.canvas = canvas;
         this.strategy = strategy;
         this.engine = engine;
         
@@ -29,7 +28,7 @@ public final class InnerEngine {
             throw new IllegalStateException("Engine already running");
         }
         
-        frame.addKeyListener(keyL);
+        canvas.addKeyListener(keyL);
         thread = new Thread (new InternalEngine(), "Engine");
         thread.start();
     }
@@ -39,7 +38,7 @@ public final class InnerEngine {
             thread.interrupt();
             thread = null;
         }
-        frame.removeKeyListener(keyL);
+        canvas.removeKeyListener(keyL);
     }
     
     private class InternalEngine implements Runnable {
@@ -53,8 +52,8 @@ public final class InnerEngine {
             while (!Thread.currentThread().isInterrupted()) {
                 do {
                     Graphics2D bg = (Graphics2D) strategy.getDrawGraphics();
-                    int width = frame.getWidth();
-                    int height = frame.getHeight();
+                    int width = canvas.getWidth();
+                    int height = canvas.getHeight();
                     RenderInfo info = new RenderInfo (width, height);
                     
                     engine.renderGame(bg, info);

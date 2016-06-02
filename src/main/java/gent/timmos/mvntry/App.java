@@ -1,8 +1,14 @@
 package gent.timmos.mvntry;
 
+import java.awt.Canvas;
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferStrategy;
 
+import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
@@ -23,15 +29,38 @@ public class App implements Runnable {
     public void run() {
         JFrame frame = new JFrame ("3D engine");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
+        frame.setSize(300, 200);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         
         Engine engine = new _2DEngine();
         
         frame.createBufferStrategy(2);
-        BufferStrategy strategy = frame.getBufferStrategy();
-        InnerEngine inner = new InnerEngine(frame, strategy, engine);
+        
+        Canvas canvas = new Canvas();
+        frame.add(canvas);
+        JMenuBar bar = new JMenuBar();
+        JMenu game = new JMenu("Game");
+        game.add(new JMenuItem(new QuitAction()));
+        bar.add(game);
+        
+        frame.setJMenuBar(bar);
+        canvas.createBufferStrategy(2);
+        BufferStrategy strategy = canvas.getBufferStrategy();
+        InnerEngine inner = new InnerEngine(canvas, strategy, engine);
         inner.start();
+    }
+    
+    private static class QuitAction extends AbstractAction {
+
+        private QuitAction() {
+            super("Quit");
+        }
+        
+        @Override
+        public void actionPerformed(ActionEvent e) {
+             System.exit(0);   
+        }
+        
     }
 }
