@@ -1,6 +1,6 @@
 package gent.timmos.mvntry.math3d;
 
-public class Plane {
+public class _3DPlane {
     /** The start point. */
     private final double[][] t_0;
     /** The (denormalized) first direction. */
@@ -8,9 +8,9 @@ public class Plane {
     /** The (denormalized) second direction. */
     private final double[][] m_1;
     
-    public Plane (Point first, Point second, Point third) {
-        t_0 = first.getMatrix();
-        m_0 = first.substractFrom(second).getMatrix();
-        m_1 = first.substractFrom(third).getMatrix();
+    public _3DPlane (double[][] direction1, double[][] direction2, double[][] offset) {
+        t_0 = offset;
+        m_0 = direction1;
+        m_1 = direction2;
     }
 }

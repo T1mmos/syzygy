@@ -1,14 +1,15 @@
 package gent.timmos.mvntry.math3d;
 
-public class Vector {
+public class _2DVector {
     
     /** The start point. */
     private final double[][] t_0;
     /** The (denormalized) direction. */
     private final double[][] m;
     
-    public Vector (Point first, Point second) {
-        t_0 = first.getMatrix();
-        m = first.substractFrom(second).getMatrix();
+    public _2DVector (double[][] direction, double[][] offset) {
+        t_0 = offset;
+        m = direction;
     }
+    
 }

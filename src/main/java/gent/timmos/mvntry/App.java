@@ -33,12 +33,11 @@ public class App implements Runnable {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         
-        Engine engine = new _2DEngine();
-        
         frame.createBufferStrategy(2);
         
         Canvas canvas = new Canvas();
         frame.add(canvas);
+        canvas.requestFocus();
         JMenuBar bar = new JMenuBar();
         JMenu game = new JMenu("Game");
         game.add(new JMenuItem(new QuitAction()));
@@ -46,7 +45,8 @@ public class App implements Runnable {
         
         frame.setJMenuBar(bar);
         canvas.createBufferStrategy(2);
-        BufferStrategy strategy = canvas.getBufferStrategy();
+        BufferStrategy strategy = canvas.getBufferStrategy();        
+        Engine engine = new _2DEngine();        
         InnerEngine inner = new InnerEngine(canvas, strategy, engine);
         inner.start();
     }
