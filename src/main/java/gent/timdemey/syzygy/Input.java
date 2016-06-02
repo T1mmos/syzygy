@@ -1,4 +1,4 @@
-package gent.timmos.mvntry;
+package gent.timdemey.syzygy;
 
 public enum Input {
     UP, 

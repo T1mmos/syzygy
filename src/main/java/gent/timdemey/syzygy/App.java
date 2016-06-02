@@ -1,4 +1,4 @@
-package gent.timmos.mvntry;
+package gent.timdemey.syzygy;
 
 import java.awt.Canvas;
 import java.awt.event.ActionEvent;
@@ -18,7 +18,7 @@ import javax.swing.WindowConstants;
 public class App implements Runnable {
     
     private App (){
-        
+         
     }
     
     public static void main(String[] args) {

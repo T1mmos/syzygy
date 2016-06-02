@@ -1,14 +1,15 @@
-package gent.timmos.mvntry.math3d;
+package gent.timdemey.syzygy.math3d;
 
-public class _3DVector {
+public class _2DVector {
     
     /** The start point. */
     private final double[][] t_0;
     /** The (denormalized) direction. */
     private final double[][] m;
     
-    public _3DVector (double[][] direction, double[][] offset) {
+    public _2DVector (double[][] direction, double[][] offset) {
         t_0 = offset;
         m = direction;
     }
+    
 }

@@ -1,6 +1,6 @@
-package gent.timmos.mvntry;
+package gent.timdemey.syzygy;
 
-import gent.timmos.mvntry.math3d._2DVector;
+import gent.timdemey.syzygy.math3d._2DVector;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

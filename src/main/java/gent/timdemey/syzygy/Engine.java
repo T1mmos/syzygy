@@ -1,4 +1,4 @@
-package gent.timmos.mvntry;
+package gent.timdemey.syzygy;
 
 import java.awt.Graphics2D;
 
