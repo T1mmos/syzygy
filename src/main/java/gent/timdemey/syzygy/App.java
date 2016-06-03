@@ -1,6 +1,7 @@
 package gent.timdemey.syzygy;
 
 import java.awt.Canvas;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferStrategy;
 
@@ -27,28 +28,28 @@ public class App implements Runnable {
 
     @Override
     public void run() {
-        JFrame frame = new JFrame ("3D engine");
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setSize(300, 200);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-        
-        frame.createBufferStrategy(2);
-        
-        Canvas canvas = new Canvas();
-        frame.add(canvas);
-        canvas.requestFocus();
         JMenuBar bar = new JMenuBar();
         JMenu game = new JMenu("Game");
         game.add(new JMenuItem(new QuitAction()));
         bar.add(game);
         
+        JFrame frame = new JFrame ("3D engine");
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setJMenuBar(bar);
+        frame.setVisible(true);
+        frame.createBufferStrategy(2);
+        
+        Canvas canvas = new Canvas();
+        frame.add(canvas);
+        canvas.requestFocus();
         canvas.createBufferStrategy(2);
         BufferStrategy strategy = canvas.getBufferStrategy();        
         Engine engine = new _2DEngine();        
         InnerEngine inner = new InnerEngine(canvas, strategy, engine);
         inner.start();
+        canvas.setPreferredSize(new Dimension(300,300));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
     }
     
     private static class QuitAction extends AbstractAction {

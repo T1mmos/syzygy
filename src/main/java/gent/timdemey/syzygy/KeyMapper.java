@@ -22,9 +22,9 @@ public enum KeyMapper {
     public Input getInput (int keycode) {
         switch (keycode) {
         case KeyEvent.VK_UP:
-            return Input.UP;
+            return Input.FORWARD;
         case KeyEvent.VK_DOWN:
-            return Input.DOWN;
+            return Input.BACKWARD;
         case KeyEvent.VK_LEFT:
             return Input.LEFT;
         case KeyEvent.VK_RIGHT:

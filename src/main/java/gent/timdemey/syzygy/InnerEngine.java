@@ -49,12 +49,14 @@ public final class InnerEngine {
             long prevtime = System.currentTimeMillis();
             final long time_start = prevtime;
             engine.initialize();
+            UpdateInfo updateInfo = new UpdateInfo.Builder().build();
             while (!Thread.currentThread().isInterrupted()) {
                 do {
                     Graphics2D bg = (Graphics2D) strategy.getDrawGraphics();
                     int width = canvas.getWidth();
                     int height = canvas.getHeight();
-                    RenderInfo info = new RenderInfo (width, height);
+                    RenderInfo info = new RenderInfo (width, height, updateInfo);
+                    
                     
                     engine.renderGame(bg, info);
                     bg.dispose();
@@ -80,10 +82,10 @@ public final class InnerEngine {
                     builder.setFPS(fps);
                     keyL.setPressedKeys(builder);
                 }
-                UpdateInfo info = builder.build();
+                updateInfo = builder.build();
                 prevtime = currtime;
                 
-                engine.updateGame(info);
+                engine.updateGame(updateInfo);
             }
         }
     }

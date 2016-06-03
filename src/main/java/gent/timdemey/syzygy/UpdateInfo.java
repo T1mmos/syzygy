@@ -1,7 +1,7 @@
 package gent.timdemey.syzygy;
 
 public final class UpdateInfo {
-    
+        
     private long prevTime = Long.MIN_VALUE;
     private long currTime = Long.MIN_VALUE;
     private long diffTime = Long.MIN_VALUE;
