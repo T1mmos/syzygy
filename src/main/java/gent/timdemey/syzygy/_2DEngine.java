@@ -1,6 +1,6 @@
 package gent.timdemey.syzygy;
 
-import gent.timdemey.syzygy.math3d.MatrixOps;
+import gent.timdemey.syzygy.math.MatrixOps;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -30,7 +30,7 @@ public class _2DEngine implements Engine {
     private double[][] T_trs = new double[][] {{0},{0}};
      
     // line defs of the player arrow
-    private static final double[][][][] lines = new double[][][][] {
+    private static final double[][][][] lines = new double[][][][] { 
         {{{0},{0}}, {{100},{-100}}},
         {{{100},{-100}}, {{100},{100}}},
         {{{100},{100}}, {{0},{0}}}
@@ -54,14 +54,13 @@ public class _2DEngine implements Engine {
 
     @Override
     public void updateGame(UpdateInfo info) {
-    //    boolean forward = info.isInputActive(Input.FORWARD);
         double secs = 1.0 * info.getDiffTime() / 1000;
         double speedmult = info.isInputActive(Input.SPEED_BOOSTER) ? 2 : 1;
         
         // calc rotation matrix
         double angle = speedmult * secs * TURN_RAD_PER_SECOND;        
         rotangle += info.isInputActive(Input.LEFT) ? angle : 0;
-        rotangle += info.isInputActive(Input.RIGHT) ? -angle : 0;                
+        rotangle += info.isInputActive(Input.RIGHT) ? -angle : 0;     
         double cos = Math.cos(rotangle);
         double sin = Math.sin(rotangle);
         T_rot = new double[][] {{cos, -sin},{sin, cos}};

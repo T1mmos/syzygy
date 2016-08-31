@@ -35,7 +35,7 @@ public class InternalKeyListener implements KeyListener {
         }
         keymask &= ~input.getBitMask();
     }
-    
+        
     /**
      * Fills in the currently pressed keys. Keys events are processed on the 
      * EDT, and this method should be called only from the inner engine's looping

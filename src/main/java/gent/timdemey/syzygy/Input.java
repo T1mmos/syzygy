@@ -9,7 +9,9 @@ public enum Input {
     BACKWARD,
     STRAFE_LEFT,
     STRAFE_RIGHT,
-    SPEED_BOOSTER;
+    SPEED_BOOSTER,
+    JUMP,
+    CROUCH;
     
     public long getBitMask () {
         return 1 << ordinal();
