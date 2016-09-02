@@ -19,121 +19,131 @@ public class CoorSys {
      * @param m the normalized casted ray angle
      * @return the wall index
      */
-    public int intersect(double[][] pos, double[] m) {
-        double cx = pos[0][0];
-        double cy = pos[1][0];
+    public WallInfo intersect(double[][] pos, double[] m) {
+        // each var described here is to be interpreted as a tuple, so z = (zx, zy)
+        // p = player position vector (double)
+        // ip = int-casted p (int)
+        // m = player view direction vector (double)
+        // b = grid boundaries (int)
+        // s = step size (-1, 0, 1) (int)
+        // h = boundary hit double coordinate (double) e.g. (bx, hy) or (hx, by) is a grid hit
+        // dxx, dyx = X-distance to hit (double)
+        // dyx, dyy = Y-distance to hit (double)
+
+        double px = pos[0][0];
+        double py = pos[1][0];
         double mx = m[0];
         double my = m[1];
+        int ipx = (int) px;
+        int ipy = (int) py;
+        int sx = (int) Math.signum(mx);
+        int sy = (int) Math.signum(my);
+        int bx = bound(px, ipx, sx);
+        int by = bound(py, ipy, sy);
+        double hx = -1.0;
+        double hy = -1.0;
+        double dxx = Double.MAX_VALUE;
+        double dxy = Double.MAX_VALUE;
+        double dyx = Double.MAX_VALUE;
+        double dyy = Double.MAX_VALUE;
 
-        int wallnr;
         while (true) {
-            // grid boundaries around pos in dir m
-            int floorx = (int) cx;
-            double remx = cx - floorx;
-            int gridx;
-            if (remx == 0.0) {
-                if (mx > 0) {
-                    gridx = floorx + 1;
-                } else if (mx < 0) {
-                    gridx = floorx - 1;
-                } else {
-                    gridx = floorx;
-                }
-            } else {
-                if (mx > 0) {
-                    gridx = floorx + 1;
-                } else if (mx < 0) {
-                    gridx = floorx;
-                } else {
-                    gridx = -1; // parallel with Y axis
-                }
+            if (dxx == Double.MAX_VALUE && mx != 0.0) { // look for hit at (bx, hy)
+                double u = (bx - px) / mx;
+                hy = py + u * my;
+                dxx = sx * (bx - px);
+                dxy = sy * (hy - py);
             }
-            int floory = (int) cy;
-            double remy = cy - floory;
-            int gridy;
-            if (remy == 0.0) {
-                if (my > 0) {
-                    gridy = floory + 1;
-                } else if (my < 0) {
-                    gridy = floory - 1;
-                } else {
-                    gridy = floory;
-                }
-            } else {
-                if (my > 0) {
-                    gridy = floory + 1;
-                } else if (my < 0) {
-                    gridy = floory;
-                } else {
-                    gridy = -1; // parallel with X axis
-                }
+            if (dyx == Double.MAX_VALUE && my != 0.0) {
+                double u = (by - py) / my;
+                hx = px + u * mx;
+                dyx = sx * (hx - px);
+                dyy = sy * (by - py);
             }
 
-            // try 2 intersections with grid, find closest point
-            double kx = -1.0;
-            if (gridx != -1) { // gridx = cx + kx * mx
-                kx = (gridx - cx) / mx;
-            }
-            double ky = -1.0;
-            if (gridy != -1) {
-                ky = (gridy - cy) / my;
-            }
-            double k;
-            if (kx != -1.0 && ky != -1.0 && kx < ky) {
-                k = kx;
-            } else if (kx != -1.0) {
-                k = kx;
-            } else {
-                k = ky;
-            }
-            cx = cx + k * mx;
-            cy = cy + k * my;
-
-            // determine the block adjacent to this point in this direction
-            int idxx = -1;
-
-            if (cx == (int) cx) {
-                if (mx > 0) {
-                    idxx = (int) cx;
-                } else if (mx < 0) {
-                    idxx = (int) cx - 1;
-                } else {
-                    idxx = (int) cx;
+            if (dxx < dyx) { // both points on same line, no Euclid dist needed
+                // (bx, hy) wins over (hx, by)
+                int idx = grid2wall(bx, sx);
+                int idy = (int) hy;
+                int wall = wall_at(idx, idy);
+                if (wall != 0) {
+                    double euclid = dist(dxx, dxy);
+                    return new WallInfo(wall, euclid);
                 }
+                dxx = Double.MAX_VALUE;
+                bx += sx;
             } else {
-                idxx = (int) cx;
-            }
-            int idxy = -1;
-            if (cy == (int) cy) {
-                if (my > 0) {
-                    idxy = (int) cy;
-                } else if (my < 0) {
-                    idxy = (int) cy - 1;
-                } else {
-                    idxy = (int) cy;
+                int idx = (int) hx;
+                int idy = grid2wall(by, sy);
+                int wall = wall_at(idx, idy);
+                if (wall != 0) {
+                    double euclid = dist(dyx, dyy);
+                    return new WallInfo(wall, euclid);
                 }
-            } else {
-                idxy = (int) cy;
-            }
-
-            wallnr = wall_at(idxx, idxy);
-            if (wallnr != 0) {
-                break;
+                dyx = Double.MAX_VALUE;
+                by += sy;
             }
         }
-        return wallnr;
-
     }
 
+    public static double dist(double x, double y) {
+        return Math.sqrt(x * x + y * y);
+    }
 
+    /**
+     * Converts a hitpoint (wall grid point) to a wall index for one axis, taking the
+     * incoming angle into account.
+     * @param hk
+     * @param sk
+     * @return
+     */
+    public static int grid2wall(int hk, int sk) {
+        int k;
+        if (sk == 1) {
+            k = hk;
+        } else if (sk == -1) {
+            k = hk - 1;
+        } else {
+            // cannot happen
+            k = -1;
+        }
+        return k;
+    }
+
+    /**
+     * Returns the next grid line perpendicular to an axis, given a player's position on that axis and direction of
+     * travel
+     * (= step size = signum of the slope in the axis' direction).
+     * @param p player position on some chosen axis
+     * @param ip the int-casted position (not calculated in this method for performance)
+     * @param s step size (-1, 0 or 1), which should equals sgn(m) with m the slope component of the view direction
+     * @return the next grid line coordinate
+     */
+    public static int bound(double p, int ip, int s) {
+        int b;
+        if (s == 0) {
+            b = -1;
+        } else {
+            if (ip == p) {
+                b = ip + s;
+            } else {
+                if (s > 0) {
+                    b = ip + 1;
+                } else {
+                    b = ip;
+                }
+            }
+        }
+        return b;
+    }
+
+    /**
+     * Checks the wall number at grid coordinate (x,y).
+     * @param x x-coordinate
+     * @param y y-coordinate
+     * @return the wall index, 0 meaning nothing there
+     */
     public int wall_at(int x, int y) {
         return world[world.length - 1 - y][x];
-    }
-
-    public static void main(String[] args) {
-        double test = -2.0;
-        double floor = (int) test;
-        System.out.println(floor);
-        System.out.println(test - floor);
     }
 }
