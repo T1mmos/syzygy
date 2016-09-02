@@ -6,33 +6,33 @@ import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
 
 public final class InnerEngine {
-    
+
     private final Canvas canvas;
     private final BufferStrategy strategy;
     private final Engine engine;
-    
+
     private final InternalKeyListener keyL;
-    
+
     private Thread thread = null;
-    
+
     public InnerEngine (Canvas canvas, BufferStrategy strategy, Engine engine){
         this.canvas = canvas;
         this.strategy = strategy;
         this.engine = engine;
-        
+
         this.keyL = new InternalKeyListener(KeyMapper.INSTANCE);
     }
-    
+
     public synchronized void start (){
         if (thread != null){
             throw new IllegalStateException("Engine already running");
         }
-        
+
         canvas.addKeyListener(keyL);
         thread = new Thread (new InternalEngine(), "Engine");
         thread.start();
     }
-    
+
     public synchronized void stop (){
         if (thread != null){
             thread.interrupt();
@@ -40,12 +40,12 @@ public final class InnerEngine {
         }
         canvas.removeKeyListener(keyL);
     }
-    
+
     private class InternalEngine implements Runnable {
 
         @Override
         public void run() {
-            
+
             long prevtime = System.currentTimeMillis();
             final long time_start = prevtime;
             engine.initialize();
@@ -56,8 +56,8 @@ public final class InnerEngine {
                     int width = canvas.getWidth();
                     int height = canvas.getHeight();
                     RenderInfo info = new RenderInfo (width, height, updateInfo);
-                    
-                    
+
+
                     engine.renderGame(bg, info);
                     bg.dispose();
                     bg = null;
@@ -72,7 +72,7 @@ public final class InnerEngine {
                 long currtime = System.currentTimeMillis();
                 long dt = currtime - prevtime;
                 int fps = (int) (dt == 0 ? 1000 : 1000 / dt);
-                
+
                 UpdateInfo.Builder builder = new UpdateInfo.Builder();
                 {
                     builder.setPreviousTime(prevtime);
@@ -84,17 +84,17 @@ public final class InnerEngine {
                 }
                 updateInfo = builder.build();
                 prevtime = currtime;
-                
+
                 engine.updateGame(updateInfo);
             }
         }
     }
-    
+
     private boolean updateScreen() {
         try {
             strategy.show();
             Toolkit.getDefaultToolkit().sync();
-            return (!strategy.contentsLost());
+            return !strategy.contentsLost();
         } catch (NullPointerException e) {
             return true;
         } catch (IllegalStateException e) {

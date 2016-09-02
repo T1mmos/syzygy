@@ -1,4 +1,4 @@
-package gent.timdemey.syzygy.math3d;
+package gent.timdemey.syzygy.math;
 
 public class Plane {
     /** The start point. */

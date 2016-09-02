@@ -17,11 +17,11 @@ import javax.swing.WindowConstants;
  * Main entrypoint.
  */
 public class App implements Runnable {
-    
+
     private App (){
-         
+
     }
-    
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new App());
     }
@@ -32,36 +32,36 @@ public class App implements Runnable {
         JMenu game = new JMenu("Game");
         game.add(new JMenuItem(new QuitAction()));
         bar.add(game);
-        
+
         JFrame frame = new JFrame ("3D engine");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setJMenuBar(bar);
         frame.setVisible(true);
         frame.createBufferStrategy(2);
-        
+
         Canvas canvas = new Canvas();
         frame.add(canvas);
         canvas.requestFocus();
         canvas.createBufferStrategy(2);
-        BufferStrategy strategy = canvas.getBufferStrategy();        
-        Engine engine = new _2DEngine();        
+        BufferStrategy strategy = canvas.getBufferStrategy();
+        Engine engine = new _RaycastingEngine();
         InnerEngine inner = new InnerEngine(canvas, strategy, engine);
         inner.start();
         canvas.setPreferredSize(new Dimension(300,300));
         frame.pack();
         frame.setLocationRelativeTo(null);
     }
-    
+
     private static class QuitAction extends AbstractAction {
 
         private QuitAction() {
             super("Quit");
         }
-        
+
         @Override
         public void actionPerformed(ActionEvent e) {
-             System.exit(0);   
+            System.exit(0);
         }
-        
+
     }
 }
