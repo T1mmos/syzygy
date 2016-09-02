@@ -61,27 +61,30 @@ public class CoorSys {
                 dyy = sy * (by - py);
             }
 
+            int idx;
+            int idy;
+            double dx;
+            double dy;
             if (dxx < dyx) { // both points on same line, no Euclid dist needed
                 // (bx, hy) wins over (hx, by)
-                int idx = grid2wall(bx, sx);
-                int idy = (int) hy;
-                int wall = wall_at(idx, idy);
-                if (wall != 0) {
-                    double euclid = dist(dxx, dxy);
-                    return new WallInfo(wall, euclid);
-                }
+                idx = grid2wall(bx, sx);
+                idy = (int) hy;
+                dx = dxx;
+                dy = dxy;
                 dxx = Double.MAX_VALUE;
                 bx += sx;
             } else {
-                int idx = (int) hx;
-                int idy = grid2wall(by, sy);
-                int wall = wall_at(idx, idy);
-                if (wall != 0) {
-                    double euclid = dist(dyx, dyy);
-                    return new WallInfo(wall, euclid);
-                }
+                idx = (int) hx;
+                idy = grid2wall(by, sy);
+                dx = dyx;
+                dy = dyy;
                 dyx = Double.MAX_VALUE;
                 by += sy;
+            }
+            int wall = wall_at(idx, idy);
+            if (wall != 0) {
+                double euclid = dist(dx, dy);
+                return new WallInfo(wall, euclid);
             }
         }
     }
