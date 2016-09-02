@@ -113,6 +113,7 @@ public class _2DEngine implements Engine {
         }
         
         g.drawString("FPS: " + info.updateInfo.getFPS(), 0, 20);
+
     }
 
 }
