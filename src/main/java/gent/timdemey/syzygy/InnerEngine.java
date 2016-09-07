@@ -45,17 +45,17 @@ public final class InnerEngine {
 
         @Override
         public void run() {
+            FrameInfo info = new FrameInfo();
 
-            long prevtime = System.currentTimeMillis();
-            final long time_start = prevtime;
+            info.prevTime = System.currentTimeMillis();
+            info.currTime = info.prevTime;
+            info.startTime = info.prevTime;
+
             engine.initialize();
-            UpdateInfo updateInfo = new UpdateInfo.Builder().build();
+
             while (!Thread.currentThread().isInterrupted()) {
                 do {
                     Graphics2D bg = (Graphics2D) strategy.getDrawGraphics();
-                    int width = canvas.getWidth();
-                    int height = canvas.getHeight();
-                    RenderInfo info = new RenderInfo (width, height, updateInfo);
 
 
                     engine.renderGame(bg, info);
@@ -63,29 +63,23 @@ public final class InnerEngine {
                     bg = null;
                 } while (!updateScreen());
 
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    Thread.interrupted();
-                    break;
-                }
-                long currtime = System.currentTimeMillis();
-                long dt = currtime - prevtime;
-                int fps = (int) (dt == 0 ? 1000 : 1000 / dt);
-
-                UpdateInfo.Builder builder = new UpdateInfo.Builder();
+                // update frame info
                 {
-                    builder.setPreviousTime(prevtime);
-                    builder.setCurrentTime(currtime);
-                    builder.setDiffTime(dt);
-                    builder.setPassedTime(currtime - time_start);
-                    builder.setFPS(fps);
-                    keyL.setPressedKeys(builder);
-                }
-                updateInfo = builder.build();
-                prevtime = currtime;
+                    long currtime = System.currentTimeMillis();
+                    long dt = currtime - info.prevTime;
+                    int fps = (int) (dt == 0 ? 1000 : 1000 / dt);
 
-                engine.updateGame(updateInfo);
+                    info.prevTime = info.currTime;
+                    info.currTime = currtime;
+                    info.diffTime = dt;
+                    info.passedTime = currtime - info.startTime;
+                    info.currFPS = fps;
+                    info.keymask = keyL.getKeyMask();
+                    info.width = canvas.getWidth();
+                    info.height = canvas.getHeight();
+                }
+
+                engine.updateGame(info);
             }
         }
     }

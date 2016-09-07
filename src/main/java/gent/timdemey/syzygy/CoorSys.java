@@ -54,21 +54,21 @@ public class CoorSys {
                 dxx = sx * (bx - px);
                 dxy = sy * (hy - py);
             }
-            if (dyx == Double.MAX_VALUE && my != 0.0) {
+            if (dyx == Double.MAX_VALUE && my != 0.0) { // look for hit at (hx, by)
                 double u = (by - py) / my;
                 hx = px + u * mx;
                 dyx = sx * (hx - px);
                 dyy = sy * (by - py);
             }
 
-            if (dxx < dyx) { // both points on same line, no Euclid dist needed
-                // (bx, hy) wins over (hx, by)
+            // both candidates on same line, no Euclid dist needed
+            if (dxx < dyx) {
                 int idx = grid2wall(bx, sx);
                 int idy = (int) hy;
                 int wall = wall_at(idx, idy);
                 if (wall != 0) {
                     double euclid = dist(dxx, dxy);
-                    return new WallInfo(wall, euclid);
+                    return new WallInfo(wall, euclid, idx, idy);
                 }
                 dxx = Double.MAX_VALUE;
                 bx += sx;
@@ -78,7 +78,7 @@ public class CoorSys {
                 int wall = wall_at(idx, idy);
                 if (wall != 0) {
                     double euclid = dist(dyx, dyy);
-                    return new WallInfo(wall, euclid);
+                    return new WallInfo(wall, euclid, idx, idy);
                 }
                 dyx = Double.MAX_VALUE;
                 by += sy;

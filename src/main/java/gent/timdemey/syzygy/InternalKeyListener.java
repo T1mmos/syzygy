@@ -4,18 +4,18 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class InternalKeyListener implements KeyListener {
-    
+
     private final KeyMapper mapper;
-    
+
     private volatile long keymask = 0;
-    
+
     InternalKeyListener (KeyMapper mapper){
         this.mapper = mapper;
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
-       
+
     }
 
     @Override
@@ -35,14 +35,8 @@ public class InternalKeyListener implements KeyListener {
         }
         keymask &= ~input.getBitMask();
     }
-        
-    /**
-     * Fills in the currently pressed keys. Keys events are processed on the 
-     * EDT, and this method should be called only from the inner engine's looping
-     * thread, so there is a little overhead in synchronization.
-     * @param builder
-     */
-    void setPressedKeys (UpdateInfo.Builder builder) {
-        builder.setKeyMask(keymask);
+
+    public long getKeyMask() {
+        return keymask;
     }
 }

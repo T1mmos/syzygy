@@ -3,6 +3,7 @@ package gent.timdemey.syzygy;
 import gent.timdemey.syzygy.math.MathUtils;
 import gent.timdemey.syzygy.math.MatrixOps;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 
 public class _RaycastingEngine implements Engine {
@@ -24,6 +25,8 @@ public class _RaycastingEngine implements Engine {
     private double[][]           T_rot;
     private double[][]           T_trs;
 
+    private WallInfo             wall                  = new WallInfo(0, 0, 0, 0);
+
     @Override
     public void initialize() {
         cs = new CoorSys(WALLS);
@@ -33,8 +36,8 @@ public class _RaycastingEngine implements Engine {
     }
 
     @Override
-    public void updateGame(UpdateInfo info) {
-        double secs = 1.0 * info.getDiffTime() / 1000;
+    public void updateGame(FrameInfo info) {
+        double secs = 1.0 * info.diffTime / 1000;
 
         if (info.isInputActive(Input.LEFT, Input.RIGHT)) {
             double d_angle = secs * TURN_RAD_PER_SECOND;
@@ -61,12 +64,27 @@ public class _RaycastingEngine implements Engine {
 
         double normangle = MathUtils.angle_canonical(rotangle);
         double[] anglevect = MathUtils.normangle2vect(normangle);
-        System.out.println("TRS=" + T_trs[0][0] + "," + T_trs[1][0] + " :: ROT=" + rotangle);
-        WallInfo wall = cs.intersect(T_trs, anglevect);
+        wall = cs.intersect(T_trs, anglevect);
+
     }
 
     @Override
-    public void renderGame(Graphics2D g, RenderInfo info) {
+    public void renderGame(Graphics2D g, FrameInfo info) {
+        g.setColor(Color.white);
+        g.fillRect(0, 0, info.width, info.height);
 
+        g.setColor(Color.gray);
+        int x = wall.x;
+        int y = wall.y;
+
+        int scrx = x;
+        int scry = 5 - y;
+
+        int width = info.width / 5;
+        int height = info.height / 5;
+        int pix_start = scrx * width;
+        int pix_end = scry * height;
+
+        g.fillRect(pix_start, pix_end, width, height);
     }
 }
