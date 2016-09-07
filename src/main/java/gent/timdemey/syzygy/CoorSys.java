@@ -29,6 +29,8 @@ public class CoorSys {
         // h = boundary hit double coordinate (double) e.g. (bx, hy) or (hx, by) is a grid hit
         // dxx, dyx = X-distance to hit (double)
         // dyx, dyy = Y-distance to hit (double)
+        // i = index of the wall that was hit
+        // d = distance between p and h
 
         double px = pos[0][0];
         double py = pos[1][0];
@@ -46,8 +48,14 @@ public class CoorSys {
         double dxy = Double.MAX_VALUE;
         double dyx = Double.MAX_VALUE;
         double dyy = Double.MAX_VALUE;
+        int ix = -1;
+        int iy = -1;
+        double dx = 0.0;
+        double dy = 0.0;
 
-        while (true) {
+        // wall color
+        int wall = 0;
+        while (wall == 0) {
             if (dxx == Double.MAX_VALUE && mx != 0.0) { // look for hit at (bx, hy)
                 double u = (bx - px) / mx;
                 hy = py + u * my;
@@ -61,33 +69,27 @@ public class CoorSys {
                 dyy = sy * (by - py);
             }
 
-
-            int idx;
-            int idy;
-            double dx;
-            double dy;
             if (dxx < dyx) { // both points on same line, no Euclid dist needed
                 // (bx, hy) wins over (hx, by)
-                idx = grid2wall(bx, sx);
-                idy = (int) hy;
+                ix = grid2wall(bx, sx);
+                iy = (int) hy;
                 dx = dxx;
                 dy = dxy;
                 dxx = Double.MAX_VALUE;
                 bx += sx;
             } else {
-                idx = (int) hx;
-                idy = grid2wall(by, sy);
+                ix = (int) hx;
+                iy = grid2wall(by, sy);
                 dx = dyx;
                 dy = dyy;
                 dyx = Double.MAX_VALUE;
                 by += sy;
             }
-            int wall = wall_at(idx, idy);
-            if (wall != 0) {
-                double euclid = dist(dx, dy);
-                return new WallInfo(wall, euclid, idx, idy);
-            }
+            wall = wall_at(ix, iy);
         }
+
+        double euclid = dist(dx, dy);
+        return new WallInfo(wall, euclid, ix, iy);
     }
 
     public static double dist(double x, double y) {
