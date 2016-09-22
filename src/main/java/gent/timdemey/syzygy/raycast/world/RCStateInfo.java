@@ -8,12 +8,12 @@ public class RCStateInfo extends StateInfo {
     public static final double  TURN_RAD_PER_SECOND   = Math.PI / 2;
 
     public static final int[][] WALLS = new int[][] {
-        {1,2,1,2,1},
-        {2,0,0,0,2},
-        {1,0,1,0,1},
-        {1,0,2,2,1},
-        {1,0,0,0,1},
-        {1,2,1,2,1}
+        {1,2,1,2,1,2,1,2,1,2,1},
+        {2,0,0,0,0,0,0,0,1,0,2},
+        {1,0,1,0,1,0,0,0,1,0,1},
+        {1,0,2,2,1,0,0,0,0,0,2},
+        {1,0,0,0,1,0,0,1,0,0,1},
+        {1,2,1,2,1,2,1,2,1,2,1}
     };
 
     public final int            walls_x               = WALLS[0].length;

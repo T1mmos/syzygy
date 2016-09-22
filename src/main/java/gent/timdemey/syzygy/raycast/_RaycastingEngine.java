@@ -62,7 +62,29 @@ public class _RaycastingEngine implements Engine {
             double actualdist = multiplier * units;
             double[][] distV = new double[][] { { actualdist }, { 0 } };
             double[][] dirV = MatrixOps.multiply(stateInfo.T_rot, distV);
+            
+            double currx = stateInfo.T_trs[0][0];
+            double curry = stateInfo.T_trs[1][0]; // haha, spicy
+            double stepx = currx + dirV[0][0];
+            double stepy = curry + dirV[1][0];
+            
+            int icurrx = (int) currx;
+            int icurry = (int) curry;
+            int istepx = (int) stepx;
+            int istepy = (int) stepy;
+            
+            if (stateInfo.WALLS[stateInfo.walls_y - 1 -istepy][icurrx] != 0){                
+                dirV[1][0] = 0;
+            }
+            if (stateInfo.WALLS[stateInfo.walls_y - 1 - icurry][istepx] != 0){
+                dirV[0][0] = 0;
+            }
+            // to do: on a wall corner we need to choose a direction
+            
             stateInfo.T_trs = MatrixOps.add(stateInfo.T_trs, dirV);
+            
+            
+            
         }
 
         double normangle = MathUtils.angle_canonical(stateInfo.rotangle);

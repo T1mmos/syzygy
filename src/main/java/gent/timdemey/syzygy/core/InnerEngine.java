@@ -65,7 +65,6 @@ public final class InnerEngine {
                     bg = null;
                 } while (!updateScreen());
 
-                // update frame info
                 {
                     long currtime = System.currentTimeMillis();
                     long dt = currtime - frameInfo.prevTime;

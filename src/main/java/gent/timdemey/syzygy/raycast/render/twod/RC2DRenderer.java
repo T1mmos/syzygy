@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 /**
  * @author Timmos
@@ -25,6 +26,7 @@ public class RC2DRenderer implements RCRenderer {
 
     @Override
     public void renderAll(Graphics2D g, FrameInfo fInfo, RenderInfo rInfo, RCStateInfo sInfo) {
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         renderBackground(newg(g), fInfo, rInfo, sInfo);
         renderGrid(newflipg(g, rInfo), fInfo, rInfo, sInfo);
         renderWalls(newflipg(g, rInfo), fInfo, rInfo, sInfo);
@@ -77,10 +79,19 @@ public class RC2DRenderer implements RCRenderer {
         double us_y = sInfo.T_trs[1][0];
 
         // screen space, 1 unit => wall width/height
-        int scr_x = (int) (us_x * ri.wallW);
-        int scr_y = (int) (us_y * ri.wallH);
+        renderDot(g, rInfo, us_x, us_y);
+    }
+    
+    private void renderDot (Graphics2D g, RenderInfo rInfo, double ux, double uy){
+        // screen space, 1 unit => wall width/height
+        int scr_x = (int) (ux * ri.wallW);
+        int scr_y = (int) (uy * ri.wallH);
+        
+        // dot size
+        int sizex = (rInfo.width / 100) | 1; // make it odd
+        int sizey = (rInfo.height / 100) | 1;
 
-        g.fillOval(scr_x - 1, scr_y - 1, 3, 3);
+        g.fillOval(scr_x - sizex / 2, scr_y - sizey / 2, sizex, sizey);
     }
 
     private void renderWalls(Graphics2D g, FrameInfo fInfo, RenderInfo info, RCStateInfo sInfo) {
@@ -101,10 +112,9 @@ public class RC2DRenderer implements RCRenderer {
     private void renderHitWall(Graphics2D g, FrameInfo fInfo, RenderInfo info, RCStateInfo sInfo) {
         g.setColor(Color.ORANGE.darker());
 
-        int scr_x = sInfo.wall.x * ri.wallW + ri.wallW / 2;
-        int scr_y = sInfo.wall.y * ri.wallH + ri.wallH / 2;
-        g.fillOval(scr_x - 3, scr_y - 3, 7, 7);
-
+        double ux = sInfo.wall.x + 0.5;
+        double uy = sInfo.wall.y +0.5;
+        renderDot(g, info, ux, uy);
     }
 
     private void renderWallpoints(Graphics2D g, FrameInfo fInfo, RenderInfo info, RCStateInfo sInfo) {
@@ -112,10 +122,7 @@ public class RC2DRenderer implements RCRenderer {
         double[][] gridhits = sInfo.wall.gridhits;
 
         for (int k = 0; k < sInfo.wall.leaps; k++) {
-            int scr_x = (int) (gridhits[k][0] * ri.wallW);
-            int scr_y = (int) (gridhits[k][1] * ri.wallH);
-
-            g.fillOval(scr_x - 1, scr_y - 1, 3, 3);
+            renderDot(g, info, gridhits[k][0],gridhits[k][1]);
         }
     }
 
