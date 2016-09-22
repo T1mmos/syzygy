@@ -28,6 +28,7 @@ public class RC2DRenderer implements RCRenderer {
         renderBackground(newg(g), fInfo, rInfo, sInfo);
         renderGrid(newflipg(g, rInfo), fInfo, rInfo, sInfo);
         renderWalls(newflipg(g, rInfo), fInfo, rInfo, sInfo);
+        renderHitWall(newflipg(g, rInfo), fInfo, rInfo, sInfo);
         renderPlayer(newflipg(g, rInfo), fInfo, rInfo, sInfo);
         renderWallpoints(newflipg(g, rInfo), fInfo, rInfo, sInfo);
         renderText(newg(g), fInfo, rInfo, sInfo);
@@ -95,6 +96,15 @@ public class RC2DRenderer implements RCRenderer {
                 g.fillRect(scr_x, scr_y, ri.wallW - 2, ri.wallH - 2);
             }
         }
+    }
+
+    private void renderHitWall(Graphics2D g, FrameInfo fInfo, RenderInfo info, RCStateInfo sInfo) {
+        g.setColor(Color.ORANGE.darker());
+
+        int scr_x = sInfo.wall.x * ri.wallW + ri.wallW / 2;
+        int scr_y = sInfo.wall.y * ri.wallH + ri.wallH / 2;
+        g.fillOval(scr_x - 3, scr_y - 3, 7, 7);
+
     }
 
     private void renderWallpoints(Graphics2D g, FrameInfo fInfo, RenderInfo info, RCStateInfo sInfo) {
