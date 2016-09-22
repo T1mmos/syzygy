@@ -16,9 +16,10 @@ public class CoorSys {
     }
 
     /**
-     * Searches for a wall intersection.
-     * @param pos camera position
-     * @param m the normalized casted ray angle
+     * Casts a ray from the given starting point in the given direction and returns all intersections with the
+     * grid. The last intersection is the result of hitting a solid wall.
+     * @param pos starting point
+     * @param m the direction vector
      * @return the wall index
      */
     public WallInfo intersect(double[][] pos, double[] m) {
@@ -29,8 +30,8 @@ public class CoorSys {
         // b = grid boundaries (int)
         // s = step size (-1, 0, 1) (int)
         // h = boundary hit double coordinate (double) e.g. (bx, hy) or (hx, by) is a grid hit
-        // dxx, dyx = X-distance to hit (double)
-        // dyx, dyy = Y-distance to hit (double)
+        // dxx, dxy = X- and Y-distances to hit with vertical grid line (double)
+        // dyx, dyy = X- and Y-distances to hit with horizontal grid line (double)
         // i = index of the wall that was hit
         // d = distance between p and h
 
@@ -73,7 +74,7 @@ public class CoorSys {
                 dyy = sy * (by - py);
             }
 
-            if (dxx < dyx) { // both points on same line, no Euclid dist needed
+            if (dxx < dyx) { // collinear points, no need for Euclid dist
                 // (bx, hy) wins over (hx, by)
                 gridhits[leaps][0] = bx;
                 gridhits[leaps][1] = hy;

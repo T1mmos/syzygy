@@ -15,6 +15,8 @@ import java.awt.Graphics2D;
  */
 public class RC2DRenderer implements RCRenderer {
 
+    private static final Font    FONT_TEXT = Font.decode("Arial 9");
+
     private final RC2DRenderInfo ri;
 
     public RC2DRenderer() {
@@ -97,7 +99,7 @@ public class RC2DRenderer implements RCRenderer {
         String p_posstr = String.format("POS=%.2f;%.2f", sInfo.T_trs[0][0], sInfo.T_trs[1][0]);
         String p_rotstr = String.format("ROT=%.2f", sInfo.rotangle);
         g.setColor(Color.YELLOW);
-        g.setFont(Font.decode("Arial 9"));
+        g.setFont(FONT_TEXT);
         g.drawString(fInfo.currFPS + " FPS", 1, 10);
         g.drawString(p_posstr, 1, 30);
         g.drawString(p_rotstr, 1, 40);
