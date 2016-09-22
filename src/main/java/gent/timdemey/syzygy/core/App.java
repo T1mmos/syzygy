@@ -1,4 +1,6 @@
-package gent.timdemey.syzygy;
+package gent.timdemey.syzygy.core;
+
+import gent.timdemey.syzygy.raycast._RaycastingEngine;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
@@ -44,12 +46,14 @@ public class App implements Runnable {
         canvas.requestFocus();
         canvas.createBufferStrategy(2);
         BufferStrategy strategy = canvas.getBufferStrategy();
+
+        canvas.setPreferredSize(new Dimension(200, 200));
+        frame.pack();
+        frame.setLocation(0, 0);
+
         Engine engine = new _RaycastingEngine();
         InnerEngine inner = new InnerEngine(canvas, strategy, engine);
         inner.start();
-        canvas.setPreferredSize(new Dimension(300,300));
-        frame.pack();
-        frame.setLocationRelativeTo(null);
     }
 
     private static class QuitAction extends AbstractAction {

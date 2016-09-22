@@ -1,4 +1,4 @@
-package gent.timdemey.syzygy;
+package gent.timdemey.syzygy.core;
 
 import java.awt.Canvas;
 import java.awt.Graphics2D;
@@ -9,7 +9,7 @@ public final class InnerEngine {
 
     private final Canvas canvas;
     private final BufferStrategy strategy;
-    private final Engine engine;
+    private final Engine              engine;
 
     private final InternalKeyListener keyL;
 
@@ -45,20 +45,22 @@ public final class InnerEngine {
 
         @Override
         public void run() {
-            FrameInfo info = new FrameInfo();
+            RenderInfo renderInfo = new RenderInfo();
+            FrameInfo frameInfo = new FrameInfo();
 
-            info.prevTime = System.currentTimeMillis();
-            info.currTime = info.prevTime;
-            info.startTime = info.prevTime;
+            frameInfo.prevTime = System.currentTimeMillis();
+            frameInfo.currTime = frameInfo.prevTime;
+            frameInfo.startTime = frameInfo.prevTime;
 
             engine.initialize();
 
             while (!Thread.currentThread().isInterrupted()) {
                 do {
+                    renderInfo.width = canvas.getWidth();
+                    renderInfo.height = canvas.getHeight();
+
                     Graphics2D bg = (Graphics2D) strategy.getDrawGraphics();
-
-
-                    engine.renderGame(bg, info);
+                    engine.renderGame(bg, frameInfo, renderInfo);
                     bg.dispose();
                     bg = null;
                 } while (!updateScreen());
@@ -66,20 +68,18 @@ public final class InnerEngine {
                 // update frame info
                 {
                     long currtime = System.currentTimeMillis();
-                    long dt = currtime - info.prevTime;
+                    long dt = currtime - frameInfo.prevTime;
                     int fps = (int) (dt == 0 ? 1000 : 1000 / dt);
 
-                    info.prevTime = info.currTime;
-                    info.currTime = currtime;
-                    info.diffTime = dt;
-                    info.passedTime = currtime - info.startTime;
-                    info.currFPS = fps;
-                    info.keymask = keyL.getKeyMask();
-                    info.width = canvas.getWidth();
-                    info.height = canvas.getHeight();
+                    frameInfo.prevTime = frameInfo.currTime;
+                    frameInfo.currTime = currtime;
+                    frameInfo.diffTime = dt;
+                    frameInfo.passedTime = currtime - frameInfo.startTime;
+                    frameInfo.currFPS = fps;
+                    frameInfo.keymask = keyL.getKeyMask();
                 }
 
-                engine.updateGame(info);
+                engine.updateState(frameInfo);
             }
         }
     }

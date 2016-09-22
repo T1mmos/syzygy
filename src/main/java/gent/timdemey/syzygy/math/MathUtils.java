@@ -24,8 +24,9 @@ public class MathUtils {
             add = -PI_2;
         }
 
+
         double corr = angle;
-        while (corr < 0 || corr >= PI_2) {
+        while (corr < 0 || corr > PI_2) {
             corr += add;
         }
         return corr;
@@ -42,8 +43,9 @@ public class MathUtils {
         } else if (angle == PI_3HALF) {
             return new double[] { 0, -1 };
         } else {
-            double tan = Math.tan(angle); // matches ||x|| = 1
-            return normvect(1, tan);
+            double cos = Math.cos(angle);
+            double sin = Math.sin(angle);
+            return new double[] { cos, sin };
         }
     }
 

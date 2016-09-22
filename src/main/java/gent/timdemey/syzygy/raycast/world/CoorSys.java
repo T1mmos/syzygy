@@ -1,4 +1,6 @@
-package gent.timdemey.syzygy;
+package gent.timdemey.syzygy.raycast.world;
+
+import gent.timdemey.syzygy.WallInfo;
 
 
 public class CoorSys {
@@ -55,6 +57,8 @@ public class CoorSys {
 
         // wall color
         int wall = 0;
+        double[][] gridhits = new double[10][2];
+        int leaps = 0;
         while (wall == 0) {
             if (dxx == Double.MAX_VALUE && mx != 0.0) { // look for hit at (bx, hy)
                 double u = (bx - px) / mx;
@@ -71,6 +75,8 @@ public class CoorSys {
 
             if (dxx < dyx) { // both points on same line, no Euclid dist needed
                 // (bx, hy) wins over (hx, by)
+                gridhits[leaps][0] = bx;
+                gridhits[leaps][1] = hy;
                 ix = grid2wall(bx, sx);
                 iy = (int) hy;
                 dx = dxx;
@@ -78,6 +84,8 @@ public class CoorSys {
                 dxx = Double.MAX_VALUE;
                 bx += sx;
             } else {
+                gridhits[leaps][0] = hx;
+                gridhits[leaps][1] = by;
                 ix = (int) hx;
                 iy = grid2wall(by, sy);
                 dx = dyx;
@@ -85,11 +93,12 @@ public class CoorSys {
                 dyx = Double.MAX_VALUE;
                 by += sy;
             }
+            leaps++;
             wall = wall_at(ix, iy);
         }
 
         double euclid = dist(dx, dy);
-        return new WallInfo(wall, euclid, ix, iy);
+        return new WallInfo(wall, euclid, gridhits, leaps, ix, iy);
     }
 
     public static double dist(double x, double y) {

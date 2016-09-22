@@ -1,4 +1,4 @@
-package gent.timdemey.syzygy;
+package gent.timdemey.syzygy.core;
 
 public enum Input {
     UP, 

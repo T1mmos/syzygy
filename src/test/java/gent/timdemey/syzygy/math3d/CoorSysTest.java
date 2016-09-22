@@ -1,7 +1,7 @@
 package gent.timdemey.syzygy.math3d;
 
-import gent.timdemey.syzygy.CoorSys;
 import gent.timdemey.syzygy.WallInfo;
+import gent.timdemey.syzygy.raycast.world.CoorSys;
 import junit.framework.TestCase;
 
 import org.junit.AfterClass;
