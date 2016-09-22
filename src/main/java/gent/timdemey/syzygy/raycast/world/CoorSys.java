@@ -1,6 +1,5 @@
 package gent.timdemey.syzygy.raycast.world;
 
-import gent.timdemey.syzygy.WallInfo;
 
 
 public class CoorSys {
@@ -30,8 +29,8 @@ public class CoorSys {
         // b = grid boundaries (int)
         // s = step size (-1, 0, 1) (int)
         // h = boundary hit double coordinate (double) e.g. (bx, hy) or (hx, by) is a grid hit
-        // dxx, dxy = X- and Y-distances to hit with vertical grid line (double)
-        // dyx, dyy = X- and Y-distances to hit with horizontal grid line (double)
+        // dx = taxi distances to hit with vertical grid line (double)
+        // dy = taxi distances to hit with horizontal grid line (double)
         // i = index of the wall that was hit
         // d = distance between p and h
 

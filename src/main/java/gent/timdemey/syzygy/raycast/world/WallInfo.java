@@ -1,4 +1,4 @@
-package gent.timdemey.syzygy;
+package gent.timdemey.syzygy.raycast.world;
 
 
 public class WallInfo {

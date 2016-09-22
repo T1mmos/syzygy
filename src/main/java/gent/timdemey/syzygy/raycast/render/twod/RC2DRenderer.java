@@ -27,6 +27,7 @@ public class RC2DRenderer implements RCRenderer {
     public void renderAll(Graphics2D g, FrameInfo fInfo, RenderInfo rInfo, RCStateInfo sInfo) {
         renderBackground(newg(g), fInfo, rInfo, sInfo);
         renderGrid(newflipg(g, rInfo), fInfo, rInfo, sInfo);
+        renderWalls(newflipg(g, rInfo), fInfo, rInfo, sInfo);
         renderPlayer(newflipg(g, rInfo), fInfo, rInfo, sInfo);
         renderWallpoints(newflipg(g, rInfo), fInfo, rInfo, sInfo);
         renderText(newg(g), fInfo, rInfo, sInfo);
@@ -49,21 +50,19 @@ public class RC2DRenderer implements RCRenderer {
     }
 
     private void renderGrid(Graphics2D g, FrameInfo fInfo, RenderInfo info, RCStateInfo sInfo) {
-        ri.walls_x = sInfo.WALLS[0].length;
-        ri.walls_y = sInfo.WALLS.length;
 
-        ri.wallW = info.width / ri.walls_x;
-        ri.wallH = info.height / ri.walls_y;
+        ri.wallW = info.width / sInfo.walls_x;
+        ri.wallH = info.height / sInfo.walls_y;
 
-        ri.gridW = ri.wallW * ri.walls_x;
-        ri.gridH = ri.wallH * ri.walls_y;
+        ri.gridW = ri.wallW * sInfo.walls_x;
+        ri.gridH = ri.wallH * sInfo.walls_y;
 
         g.setColor(Color.darkGray);
-        for (int i = 1; i < ri.walls_x; i++) {
+        for (int i = 1; i < sInfo.walls_x; i++) {
             int x = i * ri.wallW;
             g.drawLine(x, 0, x, ri.gridH);
         }
-        for (int j = 1; j < ri.walls_y; j++) {
+        for (int j = 1; j < sInfo.walls_y; j++) {
             int y = j * ri.wallH;
             g.drawLine(0, y, ri.gridW, y);
         }
@@ -81,6 +80,21 @@ public class RC2DRenderer implements RCRenderer {
         int scr_y = (int) (us_y * ri.wallH);
 
         g.fillOval(scr_x - 1, scr_y - 1, 3, 3);
+    }
+
+    private void renderWalls(Graphics2D g, FrameInfo fInfo, RenderInfo info, RCStateInfo sInfo) {
+        g.setColor(Color.BLUE.darker().darker().darker());
+        for (int k = 0; k < sInfo.walls_x; k++) {
+            for (int l = 0; l < sInfo.walls_y; l++) {
+                int nr = sInfo.WALLS[sInfo.walls_y - 1 - l][k];
+                if (nr == 0) {
+                    continue;
+                }
+                int scr_x = k * ri.wallW + 1;
+                int scr_y = l * ri.wallH + 1;
+                g.fillRect(scr_x, scr_y, ri.wallW - 2, ri.wallH - 2);
+            }
+        }
     }
 
     private void renderWallpoints(Graphics2D g, FrameInfo fInfo, RenderInfo info, RCStateInfo sInfo) {
