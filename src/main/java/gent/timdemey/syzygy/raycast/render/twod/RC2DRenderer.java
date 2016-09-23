@@ -81,15 +81,15 @@ public class RC2DRenderer implements RCRenderer {
         // screen space, 1 unit => wall width/height
         renderDot(g, rInfo, us_x, us_y);
     }
-    
+
     private void renderDot (Graphics2D g, RenderInfo rInfo, double ux, double uy){
         // screen space, 1 unit => wall width/height
         int scr_x = (int) (ux * ri.wallW);
         int scr_y = (int) (uy * ri.wallH);
-        
+
         // dot size
-        int sizex = (rInfo.width / 100) | 1; // make it odd
-        int sizey = (rInfo.height / 100) | 1;
+        int sizex = rInfo.width / 100 | 1; // make it odd
+        int sizey = rInfo.height / 100 | 1;
 
         g.fillOval(scr_x - sizex / 2, scr_y - sizey / 2, sizex, sizey);
     }
@@ -128,7 +128,7 @@ public class RC2DRenderer implements RCRenderer {
 
     private static void renderText(Graphics2D g, FrameInfo fInfo, RenderInfo info, RCStateInfo sInfo) {
         String p_posstr = String.format("POS=%.2f;%.2f", sInfo.T_trs[0][0], sInfo.T_trs[1][0]);
-        String p_rotstr = String.format("ROT=%.2f", sInfo.rotangle);
+        String p_rotstr = String.format("ROT=%.2f rad", sInfo.rotangle);
         g.setColor(Color.YELLOW);
         g.setFont(FONT_TEXT);
         g.drawString(fInfo.currFPS + " FPS", 1, 10);
