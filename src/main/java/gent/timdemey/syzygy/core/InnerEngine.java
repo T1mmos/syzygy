@@ -56,8 +56,8 @@ public final class InnerEngine {
 
             while (!Thread.currentThread().isInterrupted()) {
                 do {
-                    renderInfo.width = canvas.getWidth();
-                    renderInfo.height = canvas.getHeight();
+                    renderInfo.resx = canvas.getWidth();
+                    renderInfo.resy = canvas.getHeight();
 
                     Graphics2D bg = (Graphics2D) strategy.getDrawGraphics();
                     engine.renderGame(bg, frameInfo, renderInfo);
@@ -65,6 +65,12 @@ public final class InnerEngine {
                     bg = null;
                 } while (!updateScreen());
 
+                try {
+                    Thread.sleep(0, 200);
+                } catch (InterruptedException ex) {
+                    // TODO Auto-generated catch block
+                    ex.printStackTrace();
+                }
                 {
                     long currtime = System.currentTimeMillis();
                     long dt = currtime - frameInfo.prevTime;

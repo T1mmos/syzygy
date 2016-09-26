@@ -24,7 +24,6 @@ public class MathUtils {
             add = -PI_2;
         }
 
-
         double corr = angle;
         while (corr < 0 || corr > PI_2) {
             corr += add;

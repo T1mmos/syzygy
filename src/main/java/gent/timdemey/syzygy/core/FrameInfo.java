@@ -1,6 +1,9 @@
 package gent.timdemey.syzygy.core;
 
-
+/**
+ * Timings, current frame duration, FPS, current keymask, ...
+ * @author Timmos
+ */
 public class FrameInfo {
 
     public long prevTime   = Long.MIN_VALUE;

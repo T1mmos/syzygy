@@ -9,32 +9,34 @@ import gent.timdemey.syzygy.math.MatrixOps;
 import gent.timdemey.syzygy.raycast.render.RCRenderer;
 import gent.timdemey.syzygy.raycast.render.twod.RC2DRenderer;
 import gent.timdemey.syzygy.raycast.world.CoorSys;
-import gent.timdemey.syzygy.raycast.world.RCStateInfo;
+import gent.timdemey.syzygy.raycast.world.RCUserSpace;
 
 import java.awt.Graphics2D;
 
 public class _RaycastingEngine implements Engine {
 
-    private final RCStateInfo   stateInfo;
+    private final RCUserSpace us;
     private final RCRenderer    renderer;
 
     private CoorSys              cs;
 
 
     public _RaycastingEngine() {
-        stateInfo = new RCStateInfo();
+        us = new RCUserSpace();
         renderer = new RC2DRenderer();
     }
 
     @Override
     public void initialize() {
-        cs = new CoorSys(RCStateInfo.WALLS);
-        stateInfo.T_trs = new double[][] { { 1.5 }, { 1.5 } };
-        stateInfo.rotangle = MathUtils.PI_HALF + 0.01;
+        cs = new CoorSys(RCUserSpace.WALLS);
+        us.T_trs = new double[][] { { 1.5 }, { 1.5 } };
+        us.rotangle = MathUtils.PI_HALF + 0.01;
 
-        double cos = Math.cos(stateInfo.rotangle);
-        double sin = Math.sin(stateInfo.rotangle);
-        stateInfo.T_rot = new double[][] { { cos, -sin }, { sin, cos } };
+        double cos = Math.cos(us.rotangle);
+        double sin = Math.sin(us.rotangle);
+        us.T_rot = new double[][] { { cos, -sin }, { sin, cos } };
+        us.v_dir[0] = cos;
+        us.v_dir[1] = sin;
     }
 
     @Override
@@ -43,63 +45,60 @@ public class _RaycastingEngine implements Engine {
         double secs = 1.0 * fInfo.diffTime / 1000;
 
         if (fInfo.isInputActive(Input.LEFT, Input.RIGHT)) {
-            double d_angle = secs * RCStateInfo.TURN_RAD_PER_SECOND;
-            stateInfo.rotangle += fInfo.isInputActive(Input.LEFT) ? d_angle : 0;
-            stateInfo.rotangle += fInfo.isInputActive(Input.RIGHT) ? -d_angle : 0;
-            if (stateInfo.rotangle < 0) {
-                stateInfo.rotangle += MathUtils.PI_2;
-            }
-            if (stateInfo.rotangle > MathUtils.PI_2) {
-                stateInfo.rotangle -= MathUtils.PI_2;
-            }
+            us.d_angle = secs * RCUserSpace.TURN_RAD_PER_SECOND;
+            us.rotangle += fInfo.isInputActive(Input.LEFT) ? us.d_angle : 0;
+            us.rotangle += fInfo.isInputActive(Input.RIGHT) ? -us.d_angle : 0;
+            us.rotangle = MathUtils.angle_canonical(us.rotangle);
 
             // recalc rotation matrix
-            double cos = Math.cos(stateInfo.rotangle);
-            double sin = Math.sin(stateInfo.rotangle);
-            stateInfo.T_rot = new double[][] { { cos, -sin }, { sin, cos } };
+            double cos = Math.cos(us.rotangle);
+            double sin = Math.sin(us.rotangle);
+            us.T_rot = new double[][] { { cos, -sin }, { sin, cos } };
+            us.v_dir[0] = cos;
+            us.v_dir[1] = sin;
         }
+
+
 
         if (fInfo.isInputActive(Input.FORWARD, Input.BACKWARD)) {
             // calc translation matrix
-            double units = secs * RCStateInfo.WALK_UNITS_PER_SECOND;
-            double multiplier = 0;
-            multiplier += fInfo.isInputActive(Input.FORWARD) ? 1 : 0;
-            multiplier += fInfo.isInputActive(Input.BACKWARD) ? -1 : 0;
-            double actualdist = multiplier * units;
-            double[][] distV = new double[][] { { actualdist }, { 0 } };
-            double[][] dirV = MatrixOps.multiply(stateInfo.T_rot, distV);
+            us.d_units_base = secs * RCUserSpace.WALK_UNITS_PER_SECOND;
+            us.multiplier = 0;
+            us.multiplier += fInfo.isInputActive(Input.FORWARD) ? 1 : 0;
+            us.multiplier += fInfo.isInputActive(Input.BACKWARD) ? -1 : 0;
+            us.multiplier *= fInfo.isInputActive(Input.SPEED_BOOSTER) ? 2 : 1;
+            us.d_units_actual = us.multiplier * us.d_units_base;
+            double[][] distV = new double[][] { { us.d_units_actual }, { 0 } };
+            us.v_offset = MatrixOps.multiply(us.T_rot, distV);
 
-            double currx = stateInfo.T_trs[0][0];
-            double curry = stateInfo.T_trs[1][0]; // haha, spicy
-            double stepx = currx + dirV[0][0];
-            double stepy = curry + dirV[1][0];
+            double currx = us.T_trs[0][0];
+            double curry = us.T_trs[1][0]; // haha, spicy
+            double stepx = currx + us.v_offset[0][0];
+            double stepy = curry + us.v_offset[1][0];
 
             int icurrx = (int) currx;
             int icurry = (int) curry;
             int istepx = (int) stepx;
             int istepy = (int) stepy;
 
-            if (stateInfo.WALLS[stateInfo.walls_y - 1 -istepy][icurrx] != 0){
-                dirV[1][0] = 0;
+            if (us.WALLS[us.walls_y - 1 - istepy][icurrx] != 0) {
+                us.v_offset[1][0] = 0;
             }
-            if (stateInfo.WALLS[stateInfo.walls_y - 1 - icurry][istepx] != 0){
-                dirV[0][0] = 0;
+            if (us.WALLS[us.walls_y - 1 - icurry][istepx] != 0) {
+                us.v_offset[0][0] = 0;
             }
             // to do: on a wall corner we need to choose a direction
 
-            stateInfo.T_trs = MatrixOps.add(stateInfo.T_trs, dirV);
-
-
+            us.T_trs = MatrixOps.add(us.T_trs, us.v_offset);
 
         }
-
-        double normangle = MathUtils.angle_canonical(stateInfo.rotangle);
-        double[] anglevect = MathUtils.normangle2vect(normangle);
-        stateInfo.wall = cs.intersect(stateInfo.T_trs, anglevect);
+        us.grid_curr[0] = (int) us.T_trs[0][0];
+        us.grid_curr[1] = (int) us.T_trs[1][0];
+        us.wall = cs.intersect(us.T_trs, us.v_dir);
     }
 
     @Override
     public void renderGame(Graphics2D g, FrameInfo fInfo, RenderInfo rInfo) {
-        renderer.renderAll(g, fInfo, rInfo, stateInfo);
+        renderer.renderAll(g, fInfo, rInfo, us);
     }
 }
