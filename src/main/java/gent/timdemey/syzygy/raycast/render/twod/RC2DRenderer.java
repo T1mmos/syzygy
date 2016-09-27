@@ -32,8 +32,8 @@ public class RC2DRenderer implements RCRenderer {
     public void renderAll(Graphics2D g, FrameInfo fInfo, RenderInfo rInfo, RCUserSpace sInfo) {
         calc(fInfo, rInfo, sInfo);
 
-        //        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE);
 
         render(g, fInfo, rInfo, sInfo);
     }
@@ -47,12 +47,21 @@ public class RC2DRenderer implements RCRenderer {
 
     private void render(Graphics2D g, FrameInfo fInfo, RenderInfo rInfo, RCUserSpace sInfo) {
         renderBackground(newg(g), fInfo, rInfo, sInfo);
-        renderGrid(newflipg(g, rInfo), fInfo, rInfo, sInfo);
-        renderWalls(newflipg(g, rInfo), fInfo, rInfo, sInfo);
-        renderHitWall(newflipg(g, rInfo), fInfo, rInfo, sInfo);
-        renderPlayer(newflipg(g, rInfo), fInfo, rInfo, sInfo);
-        renderWallpoints(newflipg(g, rInfo), fInfo, rInfo, sInfo);
-        renderText(newg(g), fInfo, rInfo, sInfo);
+        renderTest(newg(g));
+        renderGrid(newg(g), fInfo, rInfo, sInfo);
+        renderWalls(newg(g), fInfo, rInfo, sInfo);
+        renderHitWall(newg(g), fInfo, rInfo, sInfo);
+        renderPlayer(newg(g), fInfo, rInfo, sInfo);
+        renderWallpoints(newg(g), fInfo, rInfo, sInfo);
+        renderText(newflipg(g, rInfo), fInfo, rInfo, sInfo);
+    }
+
+    public static void renderTest(Graphics2D g) {
+        g.setColor(Color.yellow);
+        g.fillOval(1, 1, 11, 11);
+
+        g.setColor(Color.red);
+        g.drawLine(1 + 5, 1 + 5, 100, 1 + 5);
     }
 
     private static Graphics2D newg(Graphics g) {
@@ -61,15 +70,14 @@ public class RC2DRenderer implements RCRenderer {
 
     private static Graphics2D newflipg(Graphics g, RenderInfo rInfo) {
         Graphics2D gg = newg(g);
-        gg.translate(0, rInfo.resy - 1);
+        gg.translate(0, rInfo.resy);
         gg.scale(1.0, -1.0);
-
         return gg;
     }
 
     private static void renderBackground(Graphics2D g, FrameInfo fInfo, RenderInfo info, RCUserSpace sInfo) {
         g.setColor(Color.BLACK);
-        g.fillRect(0, 0, info.resx, info.resy);
+        g.fillRect(0, 0, info.resx - 1, info.resy);
     }
 
     private void renderGrid(Graphics2D g, FrameInfo fInfo, RenderInfo rInfo, RCUserSpace sInfo) {
@@ -87,7 +95,7 @@ public class RC2DRenderer implements RCRenderer {
     private void renderPlayer(Graphics2D g, FrameInfo fInfo, RenderInfo rInfo, RCUserSpace sInfo) {
         g.setColor(Color.green);
 
-        double length = 1;
+        double length = 3;
         double us_vx = length * sInfo.v_dir[0];
         double us_vy = length * sInfo.v_dir[1];
 
@@ -108,11 +116,12 @@ public class RC2DRenderer implements RCRenderer {
 
         g.setColor(Color.red);
         g.draw(new Line2D.Double(scr_x, scr_y, scr_dx, scr_dy));
+        // g.drawLine(-500, 0, 500, 0);
+        // g.drawLine(-500, rInfo.resy, 500, rInfo.resy);
 
-        g.drawLine(0, -500, 0, 500);
     }
 
-    private void renderDot (Graphics2D g, RenderInfo rInfo, double ux, double uy){
+    private void renderDot(Graphics2D g, RenderInfo rInfo, double ux, double uy) {
         // screen space, 1 unit => wall width/height
         int scr_x = (int) (ux * ri.wallW);
         int scr_y = (int) (uy * ri.wallH);
@@ -135,7 +144,7 @@ public class RC2DRenderer implements RCRenderer {
                 }
                 int scr_x = k * ri.wallW + 1;
                 int scr_y = l * ri.wallH + 1;
-                g.fillRect(scr_x, scr_y, ri.wallW - 2, ri.wallH - 2);
+                g.fillRect(scr_x, scr_y, ri.wallW - 1, ri.wallH - 1);
             }
         }
     }

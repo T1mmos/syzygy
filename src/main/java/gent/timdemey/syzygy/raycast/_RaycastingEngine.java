@@ -12,6 +12,7 @@ import gent.timdemey.syzygy.raycast.world.CoorSys;
 import gent.timdemey.syzygy.raycast.world.RCUserSpace;
 
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 public class _RaycastingEngine implements Engine {
 
@@ -99,6 +100,14 @@ public class _RaycastingEngine implements Engine {
 
     @Override
     public void renderGame(Graphics2D g, FrameInfo fInfo, RenderInfo rInfo) {
-        renderer.renderAll(g, fInfo, rInfo, us);
+        BufferedImage img = new BufferedImage(rInfo.resx, rInfo.resy, BufferedImage.TYPE_INT_RGB);
+        Graphics2D imgg = img.createGraphics();
+        renderer.renderAll(imgg, fInfo, rInfo, us);
+        // RC2DRenderer.renderTest(gg);
+
+        Graphics2D gg = g;
+        gg.translate(0, rInfo.resy);
+        gg.scale(1.0, -1.0);
+        gg.drawImage(img, 0, 0, null);
     }
 }
