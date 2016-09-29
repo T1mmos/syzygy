@@ -60,13 +60,14 @@ public final class InnerEngine {
                     renderInfo.resy = canvas.getHeight();
 
                     Graphics2D bg = (Graphics2D) strategy.getDrawGraphics();
+                    // bg.setBackground(Color.black);
                     engine.renderGame(bg, frameInfo, renderInfo);
                     bg.dispose();
                     bg = null;
                 } while (!updateScreen());
 
                 try {
-                    Thread.sleep(0, 200);
+                    Thread.sleep(0, 10);
                 } catch (InterruptedException ex) {
                     // TODO Auto-generated catch block
                     ex.printStackTrace();

@@ -12,15 +12,13 @@ import gent.timdemey.syzygy.raycast.world.CoorSys;
 import gent.timdemey.syzygy.raycast.world.RCUserSpace;
 
 import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 
 public class _RaycastingEngine implements Engine {
 
     private final RCUserSpace us;
-    private final RCRenderer    renderer;
+    private final RCRenderer  renderer;
 
-    private CoorSys              cs;
-
+    private CoorSys           cs;
 
     public _RaycastingEngine() {
         us = new RCUserSpace();
@@ -58,8 +56,6 @@ public class _RaycastingEngine implements Engine {
             us.v_dir[0] = cos;
             us.v_dir[1] = sin;
         }
-
-
 
         if (fInfo.isInputActive(Input.FORWARD, Input.BACKWARD)) {
             // calc translation matrix
@@ -100,14 +96,9 @@ public class _RaycastingEngine implements Engine {
 
     @Override
     public void renderGame(Graphics2D g, FrameInfo fInfo, RenderInfo rInfo) {
-        BufferedImage img = new BufferedImage(rInfo.resx, rInfo.resy, BufferedImage.TYPE_INT_RGB);
-        Graphics2D imgg = img.createGraphics();
-        renderer.renderAll(imgg, fInfo, rInfo, us);
-        // RC2DRenderer.renderTest(gg);
-
         Graphics2D gg = g;
-        gg.translate(0, rInfo.resy);
-        gg.scale(1.0, -1.0);
-        gg.drawImage(img, 0, 0, null);
+        renderer.renderAll(gg, fInfo, rInfo, us);
+        gg.dispose();
     }
+
 }

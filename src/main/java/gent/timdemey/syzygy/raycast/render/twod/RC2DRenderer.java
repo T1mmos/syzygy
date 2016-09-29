@@ -1,6 +1,7 @@
 package gent.timdemey.syzygy.raycast.render.twod;
 
 import gent.timdemey.syzygy.core.FrameInfo;
+import gent.timdemey.syzygy.core.G;
 import gent.timdemey.syzygy.core.RenderInfo;
 import gent.timdemey.syzygy.raycast.render.RCRenderer;
 import gent.timdemey.syzygy.raycast.world.RCUserSpace;
@@ -10,9 +11,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
+import java.awt.image.VolatileImage;
 
 /**
  * Renders the internal world in a topdown view. This can be used a
@@ -47,49 +46,61 @@ public class RC2DRenderer implements RCRenderer {
 
     private void render(Graphics2D g, FrameInfo fInfo, RenderInfo rInfo, RCUserSpace sInfo) {
         renderBackground(newg(g), fInfo, rInfo, sInfo);
-        renderTest(newg(g));
         renderGrid(newg(g), fInfo, rInfo, sInfo);
         renderWalls(newg(g), fInfo, rInfo, sInfo);
         renderHitWall(newg(g), fInfo, rInfo, sInfo);
         renderPlayer(newg(g), fInfo, rInfo, sInfo);
         renderWallpoints(newg(g), fInfo, rInfo, sInfo);
-        renderText(newflipg(g, rInfo), fInfo, rInfo, sInfo);
-    }
-
-    public static void renderTest(Graphics2D g) {
-        g.setColor(Color.yellow);
-        g.fillOval(1, 1, 11, 11);
-
-        g.setColor(Color.red);
-        g.drawLine(1 + 5, 1 + 5, 100, 1 + 5);
+        renderText(g, fInfo, rInfo, sInfo);
     }
 
     private static Graphics2D newg(Graphics g) {
         return (Graphics2D) g.create();
     }
 
-    private static Graphics2D newflipg(Graphics g, RenderInfo rInfo) {
-        Graphics2D gg = newg(g);
-        gg.translate(0, rInfo.resy);
-        gg.scale(1.0, -1.0);
-        return gg;
-    }
+    private VolatileImage bimg = null;
 
-    private static void renderBackground(Graphics2D g, FrameInfo fInfo, RenderInfo info, RCUserSpace sInfo) {
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, info.resx - 1, info.resy);
+    private void renderBackground(Graphics2D g, FrameInfo fInfo, RenderInfo info, RCUserSpace sInfo) {
+        if (bimg == null || bimg.getWidth() != info.resx || bimg.getHeight() != info.resy) {
+            bimg = g.getDeviceConfiguration().createCompatibleVolatileImage(info.resx, info.resy, VolatileImage.OPAQUE);
+            bimg.getGraphics().setColor(Color.black);
+            bimg.getGraphics().fillRect(0, 0, info.resx, info.resy);
+        }
+        // g.drawImage(bimg, 0, 0, info.resx, info.resy, null);
+
+        // g.setColor(Color.black);
+        g.fillRect(0, 0, info.resx, info.resy);
     }
 
     private void renderGrid(Graphics2D g, FrameInfo fInfo, RenderInfo rInfo, RCUserSpace sInfo) {
-        g.setColor(Color.darkGray);
-        for (int i = 1; i < sInfo.walls_x; i++) {
+        g.setColor(Color.white);
+        for (int i = 0; i < sInfo.walls_x; i++) {
             int x = i * ri.wallW;
-            g.drawLine(x, 0, x, ri.gridH);
+            for (int j = 0; j < sInfo.walls_y; j++) {
+                int y = j * ri.wallH;
+
+                if (sInfo.WALLS[sInfo.walls_y - 1 - j][i] == 0) {
+                    continue;
+                }
+                boolean drawleft = i - 1 < 0 || sInfo.WALLS[sInfo.walls_y - 1 - j][i - 1] == 0;
+                if (drawleft) {
+                    G.NORMAL.drawLine(g, rInfo, x, y, x, y + ri.wallH);
+                }
+                boolean drawright = i + 1 > sInfo.walls_x - 1 || sInfo.WALLS[sInfo.walls_y - 1 - j][i + 1] == 0;
+                if (drawright) {
+                    G.NORMAL.drawLine(g, rInfo, x + ri.wallW, y, x + ri.wallW, y + ri.wallH);
+                }
+                boolean drawbottom = j - 1 < 0 || sInfo.WALLS[sInfo.walls_y - j][i] == 0;
+                if (drawbottom) {
+                    G.NORMAL.drawLine(g, rInfo, x, y, x + ri.wallW, y);
+                }
+                boolean drawtop = j + 1 > sInfo.walls_y - 1 || sInfo.WALLS[sInfo.walls_y - 1 - j - 1][i] == 0;
+                if (drawtop) {
+                    G.NORMAL.drawLine(g, rInfo, x, y + ri.wallH, x + ri.wallW, y + ri.wallH);
+                }
+            }
         }
-        for (int j = 1; j < sInfo.walls_y; j++) {
-            int y = j * ri.wallH;
-            g.drawLine(0, y, ri.gridW, y);
-        }
+
     }
 
     private void renderPlayer(Graphics2D g, FrameInfo fInfo, RenderInfo rInfo, RCUserSpace sInfo) {
@@ -115,10 +126,7 @@ public class RC2DRenderer implements RCRenderer {
         int scr_dy = (int) (us_dy * ri.wallH);
 
         g.setColor(Color.red);
-        g.draw(new Line2D.Double(scr_x, scr_y, scr_dx, scr_dy));
-        // g.drawLine(-500, 0, 500, 0);
-        // g.drawLine(-500, rInfo.resy, 500, rInfo.resy);
-
+        G.NORMAL.drawLine(g, rInfo, scr_x, scr_y, scr_dx, scr_dy);
     }
 
     private void renderDot(Graphics2D g, RenderInfo rInfo, double ux, double uy) {
@@ -130,8 +138,7 @@ public class RC2DRenderer implements RCRenderer {
         int sizex = ri.wallW / 4 | 1; // make it odd
         int sizey = ri.wallH / 4 | 1;
 
-        Shape oval = new Ellipse2D.Double(scr_x - sizex / 2, scr_y - sizey / 2, sizex, sizey);
-        g.fill(oval);
+        G.NORMAL.fillOval(g, rInfo, scr_x, scr_y, sizex, sizey);
     }
 
     private void renderWalls(Graphics2D g, FrameInfo fInfo, RenderInfo info, RCUserSpace sInfo) {
@@ -144,7 +151,7 @@ public class RC2DRenderer implements RCRenderer {
                 }
                 int scr_x = k * ri.wallW + 1;
                 int scr_y = l * ri.wallH + 1;
-                g.fillRect(scr_x, scr_y, ri.wallW - 1, ri.wallH - 1);
+                G.NORMAL.fillRect(g, info, scr_x, scr_y, ri.wallW - 1, ri.wallH - 1);
             }
         }
     }
@@ -162,19 +169,21 @@ public class RC2DRenderer implements RCRenderer {
         double[][] gridhits = sInfo.wall.gridhits;
 
         for (int k = 0; k < sInfo.wall.leaps; k++) {
-            renderDot(g, info, gridhits[k][0],gridhits[k][1]);
+            renderDot(g, info, gridhits[k][0], gridhits[k][1]);
         }
     }
 
     private static void renderText(Graphics2D g, FrameInfo fInfo, RenderInfo info, RCUserSpace sInfo) {
+        g.setColor(new Color(0, 0, 0, 140));
+        g.fillRect(10, 10, 100, 80);
         String p_posstr = String.format("POS=%.2f;%.2f", sInfo.T_trs[0][0], sInfo.T_trs[1][0]);
         String p_rotstr = String.format("ROT=%.2f rad", sInfo.rotangle);
         g.setColor(Color.YELLOW);
         g.setFont(FONT_TEXT);
-        g.drawString(fInfo.currFPS + " FPS", 1, 10);
-        g.drawString(p_posstr, 1, 30);
-        g.drawString(p_rotstr, 1, 40);
-        g.drawString(sInfo.wall.leaps + " grid hits", 1, 50);
-        g.drawString("Grid pos = (" + sInfo.grid_curr[0] + "," + sInfo.grid_curr[1] + ")", 1, 60);
+        g.drawString(fInfo.currFPS + " FPS", 11, 20);
+        g.drawString(p_posstr, 11, 30);
+        g.drawString(p_rotstr, 11, 40);
+        g.drawString(sInfo.wall.leaps + " grid hits", 11, 50);
+        g.drawString("Grid pos = (" + sInfo.grid_curr[0] + "," + sInfo.grid_curr[1] + ")", 11, 60);
     }
 }
