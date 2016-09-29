@@ -46,11 +46,11 @@ public final class InnerEngine {
         @Override
         public void run() {
             RenderInfo renderInfo = new RenderInfo();
-            FrameInfo frameInfo = new FrameInfo();
+            Frame frameInfo = new Frame();
 
-            frameInfo.prevTime = System.currentTimeMillis();
-            frameInfo.currTime = frameInfo.prevTime;
-            frameInfo.startTime = frameInfo.prevTime;
+            frameInfo.t_prev = System.currentTimeMillis();
+            frameInfo.t_curr = frameInfo.t_prev;
+            frameInfo.t_start = frameInfo.t_prev;
 
             engine.initialize();
 
@@ -60,7 +60,6 @@ public final class InnerEngine {
                     renderInfo.resy = canvas.getHeight();
 
                     Graphics2D bg = (Graphics2D) strategy.getDrawGraphics();
-                    // bg.setBackground(Color.black);
                     engine.renderGame(bg, frameInfo, renderInfo);
                     bg.dispose();
                     bg = null;
@@ -69,19 +68,18 @@ public final class InnerEngine {
                 try {
                     Thread.sleep(0, 10);
                 } catch (InterruptedException ex) {
-                    // TODO Auto-generated catch block
                     ex.printStackTrace();
                 }
                 {
                     long currtime = System.currentTimeMillis();
-                    long dt = currtime - frameInfo.prevTime;
+                    long dt = currtime - frameInfo.t_prev;
                     int fps = (int) (dt == 0 ? 1000 : 1000 / dt);
 
-                    frameInfo.prevTime = frameInfo.currTime;
-                    frameInfo.currTime = currtime;
-                    frameInfo.diffTime = dt;
-                    frameInfo.passedTime = currtime - frameInfo.startTime;
-                    frameInfo.currFPS = fps;
+                    frameInfo.t_prev = frameInfo.t_curr;
+                    frameInfo.t_curr = currtime;
+                    frameInfo.t_diff = dt;
+                    frameInfo.t_passed = currtime - frameInfo.t_start;
+                    frameInfo.fps = fps;
                     frameInfo.keymask = keyL.getKeyMask();
                 }
 

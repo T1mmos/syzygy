@@ -18,12 +18,12 @@ public interface Engine {
      * time difference, user input and other inputs.
      * @param info frame info such as time difference, fps, current user input, ...
      */
-    public void updateState(FrameInfo fInfo);
+    public void updateState(Frame fInfo);
 
     /**
      * Render the internal world representation on the screen.
      * @param g the graphics environment to render on
      * @param info frame info such as frame width and height, ...
      */
-    public void renderGame(Graphics2D g, FrameInfo fInfo, RenderInfo rInfo);
+    public void renderGame(Graphics2D g, Frame fInfo, RenderInfo rInfo);
 }

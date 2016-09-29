@@ -111,7 +111,7 @@ public class CoorSysTest extends TestCase {
     }
 
     private void testIntersectPriv(double px, double py, double mx, double my, int expwall) {
-        double[][] pos = new double[][] { { px }, { py } };
+        double[] pos = new double[] { px, py };
         double[] m = new double[] { mx, my };
         WallInfo wall = cs.intersect(pos, m);
         assertEquals(expwall, wall.color);

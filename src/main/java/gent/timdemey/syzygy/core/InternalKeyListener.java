@@ -3,7 +3,11 @@ package gent.timdemey.syzygy.core;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class InternalKeyListener implements KeyListener {
+/**
+ * Listens to key events and uses a {@link KeyMapper} to update the key bitmask.
+ * @author Timmos
+ */
+class InternalKeyListener implements KeyListener {
 
     private final KeyMapper mapper;
 
@@ -15,12 +19,12 @@ public class InternalKeyListener implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-
+        //
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        Input input = mapper.getInput(e.getKeyCode());
+        Action input = mapper.getInput(e.getKeyCode());
         if (input == null) {
             return;
         }
@@ -29,7 +33,7 @@ public class InternalKeyListener implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-        Input input = mapper.getInput(e.getKeyCode());
+        Action input = mapper.getInput(e.getKeyCode());
         if (input == null) {
             return;
         }

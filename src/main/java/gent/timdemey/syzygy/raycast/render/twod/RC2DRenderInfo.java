@@ -7,9 +7,9 @@ package gent.timdemey.syzygy.raycast.render.twod;
  */
 public class RC2DRenderInfo {
 
-    int wallW;
-    int wallH;
+    public int wallW;
+    public int wallH;
 
-    int gridW;
-    int gridH;
+    public int gridW;
+    public int gridH;
 }

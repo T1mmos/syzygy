@@ -21,7 +21,7 @@ public class CoorSys {
      * @param m the direction vector
      * @return the wall index
      */
-    public WallInfo intersect(double[][] pos, double[] m) {
+    public WallInfo intersect(double[] pos, double[] m) {
         // each var described here is to be interpreted as a tuple, so z = (zx, zy)
         // p = player position vector (double)
         // ip = int-casted p (int)
@@ -34,8 +34,8 @@ public class CoorSys {
         // i = index of the wall that was hit
         // d = distance between p and h
 
-        double px = pos[0][0];
-        double py = pos[1][0];
+        double px = pos[0];
+        double py = pos[1];
         double mx = m[0];
         double my = m[1];
         int ipx = (int) px;
@@ -57,7 +57,7 @@ public class CoorSys {
 
         // wall color
         int wall = 0;
-        double[][] gridhits = new double[10][2];
+        double[][] gridhits = new double[32][2];
         int leaps = 0;
         while (wall == 0) {
             if (dxx == Double.MAX_VALUE && mx != 0.0) { // look for hit at (bx, hy)
