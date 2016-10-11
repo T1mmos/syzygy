@@ -15,8 +15,8 @@ public class HitwallEntity implements RenderEntity {
     public void render(Graphics2D g, Frame fInfo, RenderInfo rInfo, GameState sInfo, RC2DRenderInfo rcInfo) {
         g.setColor(Color.ORANGE.darker());
 
-        double ux = sInfo.wall.x + 0.5;
-        double uy = sInfo.wall.y + 0.5;
+        double ux = sInfo.wall[sInfo.raycount / 2].x + 0.5;
+        double uy = sInfo.wall[sInfo.raycount / 2].y + 0.5;
         RenderUtils.renderDot(g, rInfo, rcInfo, ux, uy);
     }
 

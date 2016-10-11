@@ -26,6 +26,7 @@ public class GridEntity implements RenderEntity {
                 if (!sInfo.map.isWall(i, j)) {
                     continue;
                 }
+                // can be way more efficient, we're checking nearly all grid lines 2 times here.
                 boolean drawleft = i - 1 < 0 || !sInfo.map.isWall(i - 1, j);
                 if (drawleft) {
                     G.NORMAL.drawLine(g, rInfo, x, y, x, y + rcInfo.wallH);

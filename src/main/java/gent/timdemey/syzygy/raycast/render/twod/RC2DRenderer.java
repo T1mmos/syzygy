@@ -32,9 +32,9 @@ public class RC2DRenderer implements RCRenderer {
     private final RenderEntity[] entities_world  = new RenderEntity[] {
                     new GridEntity(),
                     new WallsEntity(),
+                    new WallpointsEntity(), new HitwallEntity(),
+
                     new PlayerEntity(),
-                    new WallpointsEntity(),
-                    new HitwallEntity(),
     };
 
     private final RenderEntity[] entities_flat  = new RenderEntity[] {

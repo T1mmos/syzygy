@@ -7,6 +7,7 @@ import gent.timdemey.syzygy.raycast.render.RCRenderer;
 import gent.timdemey.syzygy.raycast.render.twod.RC2DRenderer;
 import gent.timdemey.syzygy.raycast.world.CoorSys;
 import gent.timdemey.syzygy.raycast.world.GameState;
+import gent.timdemey.syzygy.raycast.world.WallInfo;
 
 import java.awt.Graphics2D;
 
@@ -54,9 +55,19 @@ public class _RaycastingEngine implements Engine {
         }
         state.player.teleport(nextx, nexty);
 
-        // cast
-        state.wall = cs.intersect(new double[] { nextx, nexty }, new double[] { state.player.T[0][0],
-                        state.player.T[1][0] });
+        double[] pos = new double[] { nextx, nexty };
+        double angle_step = state.player.fov / (state.raycount - 1);
+        double angle = state.player.fov_angle_left;
+
+        // cast rays
+        for (int i = 0; i < state.raycount; i++) {
+            double sin = Math.sin(angle);
+            double cos = Math.cos(angle);
+            double[] m = new double[] { cos, sin };
+            WallInfo wallInfo = cs.intersect(pos, m);
+            state.wall[i] = wallInfo;
+            angle -= angle_step;
+        }
     }
 
     @Override

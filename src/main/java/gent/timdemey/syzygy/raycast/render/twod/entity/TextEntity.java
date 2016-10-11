@@ -24,7 +24,7 @@ public class TextEntity implements RenderEntity {
         g.drawString(fInfo.fps + " FPS", 11, 20);
         g.drawString(p_posstr, 11, 30);
         g.drawString(p_rotstr, 11, 40);
-        g.drawString(sInfo.wall.leaps + " grid hits", 11, 50);
+        g.drawString(sInfo.wall[sInfo.raycount / 2].leaps + " grid hits", 11, 50);
         g.drawString("Grid pos = (" + sInfo.player.grid[0] + "," + sInfo.player.grid[1] + ")", 11, 60);
     }
 

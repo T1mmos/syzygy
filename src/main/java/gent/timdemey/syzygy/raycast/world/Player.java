@@ -13,8 +13,12 @@ public class Player {
     public static final double WALK_UNITS_PER_MS = 1.0 / 1000;
     public static final double TURN_RAD_PER_MS   = Math.PI / 2 / 1000;
 
+    public double              fov               = Math.PI / 2;
+
     // user input, used to calculate other variables (see below)
     public double              rot_angle;
+    public double              fov_angle_left;
+    public double              fov_angle_right;
 
     public double              d_trs_base;
     public double              d_trs_mult;
@@ -146,5 +150,8 @@ public class Player {
         T[0][1] = -sin;
         T[1][0] = sin;
         T[1][1] = cos;
+
+        fov_angle_left = rot_angle + fov / 2;
+        fov_angle_right = rot_angle - fov / 2;
     }
 }
