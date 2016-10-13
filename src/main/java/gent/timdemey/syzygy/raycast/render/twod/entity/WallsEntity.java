@@ -21,7 +21,7 @@ public class WallsEntity implements RenderEntity {
                 }
                 int scr_x = k * rcInfo.wallW + 1;
                 int scr_y = l * rcInfo.wallH + 1;
-                G.NORMAL.fillRect(g, rInfo, scr_x, scr_y, rcInfo.wallW - 1, rcInfo.wallH - 1);
+                G.NORMAL.fillRect(rInfo, scr_x, scr_y, rcInfo.wallW - 1, rcInfo.wallH - 1);
             }
         }
     }

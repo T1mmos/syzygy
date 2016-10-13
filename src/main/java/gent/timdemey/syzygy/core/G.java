@@ -1,6 +1,7 @@
 package gent.timdemey.syzygy.core;
 
 import java.awt.Graphics2D;
+import java.awt.Paint;
 
 /**
  * Helper class for working in different axis setup. Although one may use the
@@ -24,30 +25,80 @@ public enum G {
     /** X-axis pointing to the left, Y-axis pointing downwards. */
     G_INVERT_BOTH(false,false);
 
-
     private final boolean x_r;
     private final boolean y_up;
+
+    private Graphics2D    g = null;
+    private RenderInfo    ri = null;
 
     private G(boolean x_right, boolean y_up) {
         this.x_r = x_right;
         this.y_up = y_up;
     }
 
-    public void drawLine(Graphics2D g, RenderInfo info, int x1, int y1, int x2, int y2) {
-        int nx1 = getX(info, x1);
-        int ny1 = getY(info, y1);
-        int nx2 = getX(info, x2);
-        int ny2 = getY(info, y2);
-
-        g.drawLine(nx1, ny1, nx2, ny2);
+    public void setGraphics(Graphics2D g) {
+        this.g = g;
     }
 
+    public void setRenderInfo(RenderInfo ri) {
+        this.ri = ri;
+    }
 
-    private int getX(RenderInfo info, int x) {
+    public void setColor(Paint p) {
+        g.setPaint(p);
+    }
+
+    /**
+     * Draws in screen space the line specified with user space coordinates.
+     * @param ux1
+     * @param uy1
+     * @param ux2
+     * @param uy2
+     */
+    public void drawLine(double ux1, double uy1, double ux2, double uy2) {
+        drawLine(ux1, 0, uy1, 0, ux2, 0, uy2, 0);
+    }
+
+    /**
+     * Draws in screen space the line specified with user space coordinates. The {@code mx} and {@code my} coordinates
+     * are transformed into screen space and then the {@code qx} and {@code qy} are added as offsets in screen space,
+     * respectively.
+     * @param mx1 reference coordinate in user space
+     * @param qx1 offset for scr(mx1), so in screen space
+     * @param my1
+     * @param qy1
+     * @param mx2
+     * @param qx2
+     * @param qy2
+     * @param my2
+     */
+    public void drawLine(double mx1, int qx1, double my1, int qy1, double mx2, int qx2, double qy2, int my2) {
+        int sx1 = getX(mx1) + qx1;
+        int sy1 = getY(my1) + qy1;
+        int sx2 = getX(mx2) + qx2;
+        int sy2 = getY(my2) + qy2;
+
+        g.drawLine(sx1, sy1, sx2, sy2);
+    }
+
+    /**
+     * Converts user space x-coordinate to a screen space coordinate in the current axis system.
+     * @param x
+     * @return
+     */
+    private int us2ss_x(double x) {
+        return axify_x((int) (ri.mx * x));
+    }
+
+    private int us2ss_y(double y) {
+        return (int) (ri.my * y);
+    }
+
+    private int axify_x(int x) {
         if (x_r) {
             return x;
         }
-        return info.resx - 1 - x;
+        return ri.resx - 1 - x;
     }
 
     /**
@@ -57,23 +108,23 @@ public enum G {
      * @param w
      * @return
      */
-    private int getX(RenderInfo info, int x, int w) {
+    private int axify_x(int x, int w) {
         if (x_r) {
             return x;
         }
-        return info.resx - x - w;
+        return ri.resx - x - w;
     }
 
-    private int getY(RenderInfo info, int y) {
+    private int axify_y(int y) {
         if (y_up) {
-            return info.resy - 1 - y;
+            return ri.resy - 1 - y;
         }
         return y;
     }
 
-    private int getY(RenderInfo info, int y, int h) {
+    private int axify_y(int y, int h) {
         if (y_up) {
-            return info.resy - y - h;
+            return ri.resy - y - h;
         }
         return y;
     }
@@ -86,18 +137,18 @@ public enum G {
      * @param y
      * @param d
      */
-    public void fillOval(Graphics2D g, RenderInfo info, int x, int y, int dx, int dy) {
-        int nx = getX(info, x);
-        int ny = getY(info, y);
+    public void fillOval(int x, int y, int dx, int dy) {
+        int nx = getX(x);
+        int ny = getY(y);
         int startx = nx - dx / 2;
         int starty = ny - dy / 2;
 
         g.fillOval(startx, starty, dx, dy);
     }
 
-    public void fillRect(Graphics2D g, RenderInfo info, int x, int y, int w, int h) {
-        int nx = getX(info, x, w);
-        int ny = getY(info,y, h);
+    public void fillRect(int x, int y, int w, int h) {
+        int nx = getX(x, w);
+        int ny = getY(y, h);
         g.fillRect(nx, ny, w, h);
     }
 }

@@ -8,4 +8,7 @@ public class RenderInfo {
 
     public int             resx;
     public int             resy;
+
+    public double mx = 1;
+    public double my = 1;
 }
