@@ -6,26 +6,41 @@ import gent.timdemey.syzygy.core.RenderInfo;
 import gent.timdemey.syzygy.raycast.render.RCRenderer;
 import gent.timdemey.syzygy.raycast.render.twod.RC2DRenderer;
 import gent.timdemey.syzygy.raycast.world.CoorSys;
-import gent.timdemey.syzygy.raycast.world.GameState;
-import gent.timdemey.syzygy.raycast.world.WallInfo;
+import gent.timdemey.syzygy.raycast.world.Map;
+import gent.timdemey.syzygy.raycast.world.State;
+import gent.timdemey.syzygy.raycast.world.Ray;
 
 import java.awt.Graphics2D;
 
 public class _RaycastingEngine implements Engine {
 
-    private final GameState state;
+    private final State state;
     private final RCRenderer  renderer;
 
     private CoorSys           cs;
 
     public _RaycastingEngine() {
-        state = new GameState();
+        state = new State();
+
         renderer = new RC2DRenderer();
     }
 
     @Override
     public void initialize() {
-        cs = new CoorSys(state.map.getWalls());
+        int[][] walls   = new int[][] {
+                        {1,2,1,2,1,2,1,2,1,2,1},
+                        {2,0,0,0,0,0,0,0,1,0,2},
+                        {1,0,1,0,1,0,0,0,1,0,1},
+                        {1,0,2,2,1,0,1,0,0,0,2},
+                        {1,0,0,0,1,0,0,0,0,0,1},
+                        {1,0,0,0,1,1,1,0,1,2,1},
+                        {1,0,0,0,0,0,0,0,1,0,1},
+                        {1,2,1,2,1,2,0,2,1,0,1},
+                        {1,0,0,0,0,0,0,0,0,0,1},
+                        {1,2,1,2,1,2,1,2,1,2,1},
+        };
+        state.loadMap(Map.create(walls));
+        cs = new CoorSys(state.map);
     }
 
     @Override
@@ -64,8 +79,8 @@ public class _RaycastingEngine implements Engine {
             double sin = Math.sin(angle);
             double cos = Math.cos(angle);
             double[] m = new double[] { cos, sin };
-            WallInfo wallInfo = cs.intersect(pos, m);
-            state.wall[i] = wallInfo;
+            Ray wallInfo = cs.intersect(pos, m);
+            state.rays[i] = wallInfo;
             angle -= angle_step;
         }
     }

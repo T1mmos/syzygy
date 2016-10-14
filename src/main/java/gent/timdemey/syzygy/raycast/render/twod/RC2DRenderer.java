@@ -11,7 +11,7 @@ import gent.timdemey.syzygy.raycast.render.twod.entity.RenderEntity;
 import gent.timdemey.syzygy.raycast.render.twod.entity.TextEntity;
 import gent.timdemey.syzygy.raycast.render.twod.entity.WallpointsEntity;
 import gent.timdemey.syzygy.raycast.render.twod.entity.WallsEntity;
-import gent.timdemey.syzygy.raycast.world.GameState;
+import gent.timdemey.syzygy.raycast.world.State;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -46,7 +46,7 @@ public class RC2DRenderer implements RCRenderer {
     }
 
     @Override
-    public void renderAll(Graphics2D g, Frame fInfo, RenderInfo rInfo, GameState sInfo) {
+    public void renderAll(Graphics2D g, Frame fInfo, RenderInfo rInfo, State sInfo) {
         calc(fInfo, rInfo, sInfo);
 
         render(entities_bg, g, fInfo, rInfo, sInfo);
@@ -62,11 +62,11 @@ public class RC2DRenderer implements RCRenderer {
         render(entities_flat, g, fInfo, rInfo, sInfo);
     }
 
-    private void calc(Frame fInfo, RenderInfo rInfo, GameState sInfo) {
-        ri.wallW = (rInfo.resx - 1) / (sInfo.map.walls_x + 2); // keep a border of 1 wall width on both sides
-        ri.wallH = (rInfo.resy - 1) / (sInfo.map.walls_y + 2); // same
-        ri.gridW = ri.wallW * sInfo.map.walls_x + 1;
-        ri.gridH = ri.wallH * sInfo.map.walls_y + 1;
+    private void calc(Frame fInfo, RenderInfo rInfo, State sInfo) {
+        ri.wallW = (rInfo.resx - 1) / (sInfo.map.wallcntx + 2); // keep a border of 1 wall width on both sides
+        ri.wallH = (rInfo.resy - 1) / (sInfo.map.wallcnty + 2); // same
+        ri.gridW = ri.wallW * sInfo.map.wallcntx + 1;
+        ri.gridH = ri.wallH * sInfo.map.wallcnty + 1;
     }
 
     private static void setRenderingHints(Graphics2D g) {
@@ -74,7 +74,7 @@ public class RC2DRenderer implements RCRenderer {
         g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE);
     }
 
-    private void render (RenderEntity[] entities, Graphics2D g, Frame fInfo, RenderInfo rInfo, GameState sInfo) {
+    private void render (RenderEntity[] entities, Graphics2D g, Frame fInfo, RenderInfo rInfo, State sInfo) {
         for (int i = 0; i < entities.length; i++) {
             entities[i].render(g, fInfo, rInfo, sInfo, ri);
         }

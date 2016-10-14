@@ -2,7 +2,7 @@ package gent.timdemey.syzygy.raycast.render;
 
 import gent.timdemey.syzygy.core.Frame;
 import gent.timdemey.syzygy.core.RenderInfo;
-import gent.timdemey.syzygy.raycast.world.GameState;
+import gent.timdemey.syzygy.raycast.world.State;
 
 import java.awt.Graphics2D;
 
@@ -12,5 +12,5 @@ import java.awt.Graphics2D;
  */
 public interface RCRenderer {
 
-    public void renderAll(Graphics2D g, Frame fInfo, RenderInfo rInfo, GameState sInfo);
+    public void renderAll(Graphics2D g, Frame fInfo, RenderInfo rInfo, State sInfo);
 }

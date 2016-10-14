@@ -3,31 +3,32 @@ package gent.timdemey.syzygy.raycast.world;
 
 public class Map {
 
-    private final int[][] walls   = new int[][] {
-                    {1,2,1,2,1,2,1,2,1,2,1},
-                    {2,0,0,0,0,0,0,0,1,0,2},
-                    {1,0,1,0,1,0,0,0,1,0,1},
-                    {1,0,2,2,1,0,1,0,0,0,2},
-                    {1,0,0,0,1,0,0,0,0,0,1},
-                    {1,0,0,0,1,1,1,0,1,2,1},
-                    {1,0,0,0,0,0,0,0,1,0,1},
-                    {1,2,1,2,1,2,0,2,1,0,1},
-                    {1,0,0,0,0,0,0,0,0,0,1},
-                    {1,2,1,2,1,2,1,2,1,2,1},
-    };
+    public final int      wallcntx;
+    public final int      wallcnty;
 
-    public final int     walls_x = walls[0].length;
-    public final int     walls_y = walls.length;
+    public final Wall[][] walls;
 
-    public int[][] getWalls (){
-        return walls;
+    private Map(Wall[][] walls) {
+        this.walls = walls;
+        this.wallcntx = walls.length;
+        this.wallcnty = walls[0].length;
     }
 
-    public int at(int x, int y) {
-        return walls[walls_y - 1 - y][x];
+    public Wall at(int x, int y) {
+        return walls[wallcnty - 1 - y][x];
     }
 
     public boolean isWall(int x, int y) {
-        return at(x, y) != 0;
+        return at(x, y) != null;
+    }
+
+    public static Map create(int[][] raw) {
+        Wall[][] walls = new Wall[raw.length][raw[0].length];
+        for (int i = 0; i < raw.length; i++) {
+            for (int j = 0; j < raw[0].length; j++) {
+                walls[i][j] = raw[i][j] != 0 ? new Wall(raw[i][j], i, j) : null;
+            }
+        }
+        return new Map(walls);
     }
 }

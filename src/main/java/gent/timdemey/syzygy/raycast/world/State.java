@@ -5,27 +5,21 @@ package gent.timdemey.syzygy.raycast.world;
  * user space as opposed to screen space (which holds values for on screen rendering).
  * @author Timmos
  */
-public class GameState {
+public class State {
 
     public int          raycount = 64;
 
     public final Player player;
-    public final Map    map;
+    public Map          map      = null;
 
-    /** Holds wall information for each casted ray. */
-    public WallInfo[]   wall     = new WallInfo[raycount];
+    /** Holds information for each casted ray. */
+    public Ray[]        rays     = new Ray[raycount];
 
-    public GameState() {
+    public State() {
         this.player = new Player();
-        this.map = new Map();
-
-        for (int i = 0; i < raycount; i++) {
-            wall[i] = new WallInfo(0, 0, new double[][] { {} }, 0, 0, 0);
-        }
     }
 
-
-
-
-
+    public void loadMap(Map map) {
+        this.map = map;
+    }
 }

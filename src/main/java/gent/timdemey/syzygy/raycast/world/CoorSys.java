@@ -8,10 +8,10 @@ public class CoorSys {
      * Array is to be treated upside down, as in a normal x-y axis system. Higher Y number means upwards, 0 is next to
      * the X axis.
      */
-    private final int[][] world;
+    private final Map map;
 
-    public CoorSys(int[][] world) {
-        this.world = world;
+    public CoorSys(Map map) {
+        this.map = map;
     }
 
     /**
@@ -21,7 +21,7 @@ public class CoorSys {
      * @param m the direction vector
      * @return the wall index
      */
-    public WallInfo intersect(double[] pos, double[] m) {
+    public Ray intersect(double[] pos, double[] m) {
         // each var described here is to be interpreted as a tuple, so z = (zx, zy)
         // p = player position vector (double)
         // ip = int-casted p (int)
@@ -56,10 +56,10 @@ public class CoorSys {
         double dy = 0.0;
 
         // wall color
-        int wall = 0;
+        Wall wall = null;
         double[][] gridhits = new double[32][2];
         int leaps = 0;
-        while (wall == 0) {
+        while (wall == null) {
             if (dxx == Double.MAX_VALUE && mx != 0.0) { // look for hit at (bx, hy)
                 double u = (bx - px) / mx;
                 hy = py + u * my;
@@ -94,11 +94,11 @@ public class CoorSys {
                 by += sy;
             }
             leaps++;
-            wall = wall_at(ix, iy);
+            wall = map.at(ix, iy);
         }
 
         double euclid = dist(dx, dy);
-        return new WallInfo(wall, euclid, gridhits, leaps, ix, iy);
+        return new Ray(wall, euclid, gridhits, leaps, ix, iy);
     }
 
     public static double dist(double x, double y) {
@@ -150,15 +150,5 @@ public class CoorSys {
             }
         }
         return b;
-    }
-
-    /**
-     * Checks the wall number at grid coordinate (x,y).
-     * @param x x-coordinate
-     * @param y y-coordinate
-     * @return the wall index, 0 meaning nothing there
-     */
-    public int wall_at(int x, int y) {
-        return world[world.length - 1 - y][x];
     }
 }

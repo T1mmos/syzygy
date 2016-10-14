@@ -4,7 +4,7 @@ import gent.timdemey.syzygy.core.Frame;
 import gent.timdemey.syzygy.core.G;
 import gent.timdemey.syzygy.core.RenderInfo;
 import gent.timdemey.syzygy.raycast.render.twod.RC2DRenderInfo;
-import gent.timdemey.syzygy.raycast.world.GameState;
+import gent.timdemey.syzygy.raycast.world.State;
 
 import java.awt.Color;
 
@@ -15,9 +15,9 @@ import java.awt.Color;
 public class GridEntity implements RenderEntity {
 
     @Override
-    public void render(Frame fInfo, RenderInfo rInfo, GameState sInfo, RC2DRenderInfo rcInfo) {
+    public void render(Frame fInfo, RenderInfo rInfo, State sInfo, RC2DRenderInfo rcInfo) {
         G.NORMAL.setColor(Color.white);
-        for (int i = 0; i < sInfo.map.walls_x; i++) {
+        for (int i = 0; i < sInfo.map.wallcntx; i++) {
             for (int j = 0; j < sInfo.map.walls_y; j++) {
                 if (!sInfo.map.isWall(i, j)) {
                     continue;
@@ -27,7 +27,7 @@ public class GridEntity implements RenderEntity {
                 if (drawleft) {
                     G.NORMAL.drawLine(i, j, i, j + 1);
                 }
-                boolean drawright = i + 1 > sInfo.map.walls_x - 1 || !sInfo.map.isWall(i + 1, j);
+                boolean drawright = i + 1 > sInfo.map.wallcntx - 1 || !sInfo.map.isWall(i + 1, j);
                 if (drawright) {
                     G.NORMAL.drawLine(x + rcInfo.wallW, y, x + rcInfo.wallW, y + rcInfo.wallH);
                 }

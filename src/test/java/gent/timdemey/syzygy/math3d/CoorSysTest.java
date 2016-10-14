@@ -1,7 +1,7 @@
 package gent.timdemey.syzygy.math3d;
 
 import gent.timdemey.syzygy.raycast.world.CoorSys;
-import gent.timdemey.syzygy.raycast.world.WallInfo;
+import gent.timdemey.syzygy.raycast.world.Ray;
 import junit.framework.TestCase;
 
 import org.junit.AfterClass;
@@ -113,7 +113,7 @@ public class CoorSysTest extends TestCase {
     private void testIntersectPriv(double px, double py, double mx, double my, int expwall) {
         double[] pos = new double[] { px, py };
         double[] m = new double[] { mx, my };
-        WallInfo wall = cs.intersect(pos, m);
+        Ray wall = cs.intersect(pos, m);
         assertEquals(expwall, wall.color);
     }
 }

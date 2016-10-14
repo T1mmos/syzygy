@@ -49,7 +49,7 @@ public enum G {
     }
 
     /**
-     * Draws in screen space the line specified with user space coordinates.
+     * Draws in screen space the line specified with model space coordinates.
      * @param ux1
      * @param uy1
      * @param ux2
@@ -72,11 +72,11 @@ public enum G {
      * @param qy2
      * @param my2
      */
-    public void drawLine(double mx1, int qx1, double my1, int qy1, double mx2, int qx2, double qy2, int my2) {
-        int sx1 = getX(mx1) + qx1;
-        int sy1 = getY(my1) + qy1;
-        int sx2 = getX(mx2) + qx2;
-        int sy2 = getY(my2) + qy2;
+    public void drawLine(double mx1, int qx1, double my1, int qy1, double mx2, int qx2, double my2, int qy2) {
+        int sx1 = us2ss_x(mx1) + qx1;
+        int sy1 = us2ss_y(my1) + qy1;
+        int sx2 = us2ss_x(mx2) + qx2;
+        int sy2 = us2ss_y(my2) + qy2;
 
         g.drawLine(sx1, sy1, sx2, sy2);
     }
