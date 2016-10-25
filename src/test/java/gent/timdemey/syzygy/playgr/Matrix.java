@@ -25,6 +25,38 @@ public class Matrix {
     public static Matrix createVector(double ... nrs) {
         return new Matrix(nrs.length, 1, nrs);
     }
+    
+    public static Matrix createRotationZ(double angle){
+        double sin = Math.sin(angle);
+        double cos = Math.cos(angle);
+        
+        return new Matrix(3,3,cos,-sin,0,sin,cos,0,0,0,1);
+    }
+    
+    public static Matrix createRotationY(double angle){
+        double sin = Math.sin(angle);
+        double cos = Math.cos(angle);
+        
+        return new Matrix(3,3,cos,0,-sin,0,1,0,sin,0,cos);
+    }
+    
+    public Matrix transpose (){
+        Matrix m = new Matrix(hor, ver);
+        
+        for (int i = 0; i < ver; i++){
+            for (int j = 0; j < hor; j++){
+                m.nrs[j * hor + i] = nrs[i * ver + j];
+            }
+        }
+        return m;
+    }
+    
+    public static Matrix createRotationX(double angle){
+        double sin = Math.sin(angle);
+        double cos = Math.cos(angle);
+        
+        return new Matrix(3,3,1,0,0,0,cos,-sin,0,sin,cos);
+    }
 
     public Matrix multiply(Matrix rightof) {
         if (this.hor != rightof.ver) {
@@ -48,6 +80,19 @@ public class Matrix {
             }
             System.out.println("");
         }
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < ver; i++) {
+            b.append("[");
+            for (int j = 0; j < hor; j++) {
+                b.append(nrs[i * hor + j] + (j < hor - 1 ? "," : ""));
+            }
+            b.append("]\n");
+        }
+        return b.toString();
     }
 
     public static void main(String[] args) {
