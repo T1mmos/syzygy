@@ -15,47 +15,46 @@ public class Matrix {
         this.nrs = nrs;
     }
 
-    // used to create an unfilled matrix
-    private Matrix(int ver, int hor) {
+    /**
+     * Creates a zero matrix.
+     * @param ver
+     * @param hor
+     */
+    public Matrix(int ver, int hor) {
         this.ver = ver;
         this.hor = hor;
         this.nrs = new double[hor * ver];
     }
 
+    public double get(int ver, int hor) {
+        return nrs[ver * this.hor + hor];
+    }
+
+    public int getHeight() {
+        return ver;
+    }
+
+    public int getWidth() {
+        return hor;
+    }
+
+    public void set(int ver, int hor, double value) {
+        nrs[ver * this.hor + hor] = value;
+    }
+
     public static Matrix createVector(double ... nrs) {
         return new Matrix(nrs.length, 1, nrs);
     }
-    
-    public static Matrix createRotationZ(double angle){
-        double sin = Math.sin(angle);
-        double cos = Math.cos(angle);
-        
-        return new Matrix(3,3,cos,-sin,0,sin,cos,0,0,0,1);
-    }
-    
-    public static Matrix createRotationY(double angle){
-        double sin = Math.sin(angle);
-        double cos = Math.cos(angle);
-        
-        return new Matrix(3,3,cos,0,-sin,0,1,0,sin,0,cos);
-    }
-    
+
     public Matrix transpose (){
         Matrix m = new Matrix(hor, ver);
-        
+
         for (int i = 0; i < ver; i++){
             for (int j = 0; j < hor; j++){
                 m.nrs[j * hor + i] = nrs[i * ver + j];
             }
         }
         return m;
-    }
-    
-    public static Matrix createRotationX(double angle){
-        double sin = Math.sin(angle);
-        double cos = Math.cos(angle);
-        
-        return new Matrix(3,3,1,0,0,0,cos,-sin,0,sin,cos);
     }
 
     public Matrix multiply(Matrix rightof) {
@@ -81,7 +80,7 @@ public class Matrix {
             System.out.println("");
         }
     }
-    
+
     @Override
     public String toString() {
         StringBuilder b = new StringBuilder();
