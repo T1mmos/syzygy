@@ -95,18 +95,18 @@ public class Camera {
         double tanfov = Math.tan(fov / 2);
         double sx = 2 * tanfov / resx;
         double sy = 2 * tanfov / resy;
-        S = CameraUtils.createScale(sx, sy, 1);
+        S = CameraUtils.createScale(sx, sy);
 
         double px = P.get(0, 0);
         double py = P.get(1, 0);
         double pz = P.get(2, 0);
         T = CameraUtils.createTranslation(px, py, pz);
 
-        M = V.multiply(Ry).multiply(Rp).multiply(S).multiply(T);
+        M = V.multiply(Ry).multiply(Rp).multiply(T);
 
         T2D = CameraUtils.createTranslation(-resx / 2, +resy / 2);
         S2D = CameraUtils.createScale(1, -1);
-        M2D = C.multiply(S2D).multiply(T2D);
+        M2D = C.multiply(S2D).multiply(T2D).multiply(S);
     }
 
     public void setPinhole(Matrix P){
@@ -151,13 +151,12 @@ public class Camera {
     }
 
     public Matrix snap(Matrix point) {
+        V.multiply(Ry.multiply(Rp.multiply(T.multiply(point))));
         Matrix proj = M.multiply(point);
 
         double reciprocal = 1 / proj.get(2, 0);
         Matrix F1 = CameraUtils.create3Dto2DMatrix(reciprocal);
-        F1.multiply(proj);
-        return M2D.multiply(F1).multiply(proj);
-
+        return C.multiply(S2D.multiply(T2D.multiply(S.multiply(F1.multiply(proj)))));
     }
 
     /**
@@ -171,11 +170,13 @@ public class Camera {
 
     public static void main(String[] args) {
         Camera cam = new Camera();
-        cam.setYaw(Math.toRadians(45));
+        cam.setYaw(Math.toRadians(90+45));
+        cam.setPitch(Math.toRadians(45));
         cam.calc();
         Matrix point = new Matrix(4, 1, 0, 0, -3, 1);
 
         Matrix result = cam.snap(point);
-        System.out.println(result);
+        
+        System.out.println(result.toStringInt());
     }
 }

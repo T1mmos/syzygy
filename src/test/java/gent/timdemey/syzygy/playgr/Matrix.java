@@ -4,7 +4,9 @@ package gent.timdemey.syzygy.playgr;
 public class Matrix {
 
     private final double[] nrs;
+    
     private final int      ver, hor;
+    
 
     public Matrix(int ver, int hor, double ... nrs) {
         if (nrs.length == 0 || nrs.length != hor * ver) {
@@ -45,7 +47,7 @@ public class Matrix {
     public static Matrix createVector(double ... nrs) {
         return new Matrix(nrs.length, 1, nrs);
     }
-
+    
     public Matrix transpose (){
         Matrix m = new Matrix(hor, ver);
 
@@ -72,33 +74,32 @@ public class Matrix {
         return result;
     }
 
-    private void print() {
-        for (int i = 0; i < ver; i++) {
-            for (int j = 0; j < hor; j++) {
-                System.out.print(nrs[i * hor + j] + ",");
-            }
-            System.out.println("");
-        }
-    }
-
     @Override
     public String toString() {
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < ver; i++) {
             b.append("[");
             for (int j = 0; j < hor; j++) {
-                b.append(nrs[i * hor + j] + (j < hor - 1 ? "," : ""));
+                double nr = nrs[i * hor + j];
+                String format = nr > 0 ? " %-5.2f" : "%-5.2f";
+                String nice = String.format(format, nr);
+                b.append(nice + (j < hor - 1 ? "," : ""));
             }
             b.append("]\n");
         }
         return b.toString();
     }
-
-    public static void main(String[] args) {
-        Matrix m1 = new Matrix(2, 2, 1, -1, -1, 1);
-        Matrix m2 = new Matrix(2, 2, 2, 3, 5, 1);
-
-        Matrix result = m1.multiply(m2);
-        result.print();
+    
+    public String toStringInt() {
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < ver; i++) {
+            b.append("[");
+            for (int j = 0; j < hor; j++) {
+                String nice = String.format("%-5d", (int) nrs[i * hor + j]);
+                b.append(nice + (j < hor - 1 ? "," : ""));
+            }
+            b.append("]\n");
+        }
+        return b.toString();
     }
 }
