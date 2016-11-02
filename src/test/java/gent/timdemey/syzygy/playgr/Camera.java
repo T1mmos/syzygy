@@ -129,7 +129,7 @@ public final class Camera {
      */
     public void setFov(double fov){
         if (!(FOV_MIN <= fov && fov <= FOV_MAX)){
-            throw new IllegalArgumentException("FOV not allowed: " + fov);
+            return;
         }
         this.fov = fov;
     }

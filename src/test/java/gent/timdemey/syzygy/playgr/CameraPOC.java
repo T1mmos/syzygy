@@ -11,6 +11,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -94,6 +95,14 @@ public class CameraPOC {
                     cam.addPinhole(0, 0, -0.25);
                 } else if (KeyEvent.VK_D == e.getKeyCode()) {
                     cam.addPinhole(0, 0, +0.25);
+                } else if (KeyEvent.VK_SPACE == e.getKeyCode()) {
+                    cam.addPinhole(0, +0.25, 0);
+                } else if (KeyEvent.VK_SHIFT == e.getKeyCode()) {
+                    cam.addPinhole(0, -0.25, 0);
+                } else if (KeyEvent.VK_UP == e.getKeyCode()) {
+                    cam.setFov(cam.getFov() + Math.toRadians(5));
+                } else if (KeyEvent.VK_DOWN == e.getKeyCode()) {
+                    cam.setFov(cam.getFov() + Math.toRadians(-5));
                 }
                 cam.recalc();
                 snap();
