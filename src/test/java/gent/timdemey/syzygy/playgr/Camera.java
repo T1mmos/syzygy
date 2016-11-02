@@ -11,71 +11,77 @@ package gent.timdemey.syzygy.playgr;
  * <li>pitch: influences the rotation around the Z axis (looking up/down);
  * <li>yaw: influences the rotation around the Y axis (looking left/right);
  * </ul>
- * The camera transforms coordinates by applying transformations in this order:
+ * The camera transforms 3D coordinates by applying transformations in a particular order known as "TYPSY":
  * <ul>
- * </li>translation (actual camera location) </li>scaling (Y and Z are rescaled to express in resolution units)
- * </li>rotation (looking up / down, a.k.a. pitch) </li>rotation (looking left / right, a.k.a. yaw)
+ * <li>T: translation (actual camera location)
+ * <li>Y: rotation around Y axis a.k.a. yaw
+ * <li>P: rotation around Z axis a.k.a. pitch
+ * <li>SY: switches X and Z axis, so exchanges X and Z coordinates in order to get to the WHD format: width, height,
+ * depth.
+ * </ul>
+ * The third 3D rotation, "roll", is not supported. From the transformed point, additional 2D transformations are
+ * executed known as "RSOC":
+ * <ul>
+ * <li>R: the point is homogenized by multiplying all coordinates with the reciprocal of the depth, and the 3rd
+ * dimension is stripped off. The resulting 2D point is now in the homogenized format (px, py, 1).
+ * <li>S: scales the coordinate to screen resolution and reverses the Y axis (as 2D graphics mostly use a downwards Y).
+ * <li>O: translates the axis system to the upper left corner of the screen (as 2D graphics mostly have their origin
+ * there).
+ * <li>C: makes a Carthesian coordinate from the homogeneous coordinate. The coordinates are now "screen ready".
  * </ul>
  * @author Timmos
  */
-public class Camera {
+public final class Camera {
 
-    private static final double FOV_MIN = Math.PI / 3;
-    private static final double FOV_MAX = Math.PI / 2;
+    private static final double RAD_360   = Math.toRadians(360);
+    private static final double RAD_90    = Math.toRadians(90);
+    private static final double RAD_60    = Math.toRadians(60);
 
-    // Switches axes. X-D, Y-H, Z-W, so DHW, but we must have WHD, so switch axis 0 and 2
-    private static final Matrix V       = CameraUtils.createAxisSwitch(2, 1, 0);
+    private static final double MAX_PITCH = RAD_90;
+    private static final double FOV_MIN   = RAD_60;
+    private static final double FOV_MAX   = RAD_90;
 
-    // removes the 3rd coordinate: from 2D homogeneous to 2D carthesian space
-    private static Matrix       C       = CameraUtils.createCarthMatrix();
+
 
     // FOV in radians
-    private double              fov     = Math.toRadians(75);
+    private double              fov       = RAD_60;
 
-    // camera translation, so the point where the pinhole is.
-    private Matrix              P       = Matrix.createVector(0, 0, 0);
+    // camera pinhole location
+    private Matrix              L         = Matrix.createVector(0, 0, 0);
 
     // yaw and pitch angles, in radians
-    private double              yaw     = 0;
-    private double              pitch   = 0;
+    private double              yaw       = 0;
+    private double              pitch     = 0;
 
     // resolution
-    private int                 resx    = 300, resy = 200;
+    private int                 resx      = 300, resy = 200;
 
-    // derived properties
+    // derived matrices
+    // 3D: "TYPSY"
     // translation 3D
-    private Matrix              T       = null;
-    // scaling 3D
-    private Matrix              S       = null;
-    // rotation 3D around Z axis a.k.a. "pitch"
-    private Matrix              Rp      = null;
+    private Matrix              T         = null;
     // rotation 3D around y axis a.k.a. "yaw"
-    private Matrix              Ry      = null;
+    private Matrix              Y         = null;
+    // rotation 3D around Z axis a.k.a. "pitch"
+    private Matrix              P         = null;
+    // Switches axes. X-D, Y-H, Z-W, so DHW, but we must have WHD, so switch axis 0 and 2
+    private static final Matrix SY        = CameraUtils.createAxisSwitch(2, 1, 0);
     // combined 3D transformation
-    private Matrix              M       = null;
+    private Matrix              M3D       = null;
 
-
-    // translation 2D to move the origin to the upper left of the projection plane
-    private Matrix              T2D     = null;
-    // scale to flip the Height axis (Y on screen), so it points downwards
-    private Matrix              S2D     = null;
+    // 2D: "SOC"
+    // rescales to resolution / screen coordinates
+    private Matrix              S         = null;
+    // translation to move the origin to the upper left of the projection plane
+    private Matrix              O         = null;
+    // removes the 3rd coordinate from a 2D point: from 2D homogeneous to 2D carthesian
+    private static final Matrix C         = CameraUtils.createCarthMatrix();
     // combined 2D transformation
-    private Matrix              M2D     = null;
-
-
+    private Matrix              M2D       = null;
 
     /** Creates a camera with default parameters. */
     public Camera() {
         calc();
-    }
-
-    /**
-     * Creates a camera with pinhole at P (translation). Other parameters are defaulted.
-     * @param P
-     * @param fov
-     */
-    public Camera(Matrix P) {
-        this.P = P;
     }
 
     /**
@@ -88,31 +94,39 @@ public class Camera {
 
     // calculate derived vectors: s, u, v
     private void calc (){
-        Ry = CameraUtils.createYaw(yaw);
-        Rp = CameraUtils.createPitch(pitch);
+        Y = CameraUtils.createYaw(yaw);
+        P = CameraUtils.createPitch(pitch);
+
+        double px = L.get(0, 0);
+        double py = L.get(1, 0);
+        double pz = L.get(2, 0);
+        T = CameraUtils.createTranslation(px, py, pz);
+
+        M3D = SY.multiply(P).multiply(Y).multiply(T);
 
         // we take ||u|| = 1, then half the camera plane width in WHD equals tan(fov / 2) in XYZ
         double tanfov = Math.tan(fov / 2);
-        double sx = 2 * tanfov / resx;
-        // double sy = 2 * tanfov / resy;
-        S = CameraUtils.createScale(sx, sx);
+        double scale = 2 * tanfov / resx;
 
-        double px = P.get(0, 0);
-        double py = P.get(1, 0);
-        double pz = P.get(2, 0);
-        T = CameraUtils.createTranslation(px, py, pz);
-
-        M = V.multiply(Ry).multiply(Rp).multiply(T);
-
-        T2D = CameraUtils.createTranslation(-resx / 2, +resy / 2);
-        S2D = CameraUtils.createScale(1, -1);
-        M2D = C.multiply(S2D).multiply(T2D).multiply(S);
+        // pixels are square, and XYZ has 1-1-1 ratio, but 2D graphics have downwards Y.
+        S = CameraUtils.createScale(scale, -scale);
+        O = CameraUtils.createTranslation(-resx / 2, -resy / 2);
+        // S2D = CameraUtils.createScale(1, -1);
+        M2D = C.multiply(O).multiply(S); // .multiply(S2D)
     }
 
+    /**
+     * Sets the camera location (translation).
+     * @param P camera location vector matrix
+     */
     public void setPinhole(Matrix P){
-        this.P = P;
+        this.L = P;
     }
 
+    /**
+     * Sets the field of view.
+     * @param fov the field of view, in radians
+     */
     public void setFov(double fov){
         if (!(FOV_MIN <= fov && fov <= FOV_MAX)){
             throw new IllegalArgumentException("FOV not allowed: " + fov);
@@ -120,76 +134,118 @@ public class Camera {
         this.fov = fov;
     }
 
-    public void setYaw(double rot) {
-        this.yaw = rot;
+    /**
+     * Sets the angle of horizontal rotation a.k.a. "yaw" (looking sideways).
+     * @param angle the yaw angle
+     */
+    public void setYaw(double angle) {
+        this.yaw = angle;
+        if (yaw >= RAD_360) {
+            yaw -= RAD_360;
+        }
+        if (yaw < 0) {
+            yaw += RAD_360;
+        }
     }
 
+    /**
+     * Adds the given angle to the current yaw angle.
+     * @param rot the angle to add to the current yaw angle
+     */
     public void addYaw(double rot) {
-        this.yaw += rot;
+        setYaw(yaw + rot);
     }
 
-    public void setPitch(double tilt) {
-        this.pitch = tilt;
+    /**
+     * Sets the angle of vertical rotation a.k.a. "pitch" (looking up/down).
+     * @param angle the pitch angle
+     */
+    public void setPitch(double angle) {
+        this.pitch = angle;
+        if (this.pitch > MAX_PITCH) {
+            this.pitch = MAX_PITCH;
+        }
     }
 
-    public void addPitch(double tilt) {
-        this.pitch += tilt;
+    /**
+     * Adds the given angle to the current pitch angle.
+     * @param angle the angle to add to the current pitch angle
+     */
+    public void addPitch(double angle) {
+        setPitch(this.pitch + angle);
     }
 
-    // getters
+    /**
+     * Gets the field of view angle.
+     * @return the field of view, in radians
+     */
     public double getFov (){
         return fov;
     }
 
     /**
-     * Gets the coordinates in XYZ space of the pinhole of this camera.
-     * @return
+     * Gets the coordinates in XYZ space of the pinhole.
+     * @return the pinhole location vector, in XYZ space
      */
     public Matrix getPinhole() {
-        return P;
+        return L;
     }
 
     /**
-     * Gets the yaw, or the rotation around the Y axis of this camera. According to the right-hand axis
+     * Adds, in XYZ space, the given offsets to the current pinhole location.
+     * @param x X offset
+     * @param y Y offset
+     * @param z Z offset
+     */
+    public void addPinhole(double x, double y, double z) {
+        addPinhole(0, x);
+        addPinhole(1, y);
+        addPinhole(2, z);
+    }
+
+    private void addPinhole(int idx, double val) {
+        L.set(idx, 0, L.get(idx, 0) + val);
+    }
+
+    /**
+     * Gets the yaw angle. According to the right-hand axis
      * convention, a positive yaw means that the camera rotated to the left.
-     * @return
+     * @return the yaw angle
      */
     public double getYaw (){
         return yaw;
     }
 
-    public void setResolution(int resx, int resy) {
-        this.resx = resx;
-        this.resy = resy;
-    }
-
-    public Matrix snap(Matrix point) {
-        V.multiply(Ry.multiply(Rp.multiply(T.multiply(point))));
-        Matrix proj = M.multiply(point);
-
-        double reciprocal = 1 / (proj.get(2, 0) + 0);
-        Matrix F1 = CameraUtils.create3Dto2DMatrix(reciprocal);
-        return C.multiply(S2D.multiply(T2D.multiply(S.multiply(F1.multiply(proj)))));
-    }
-
     /**
-     * Gets the pitch, or the rotation around the Z axis of this camera. According to the right-hand axis
+     * Gets the pitch angle. According to the right-hand axis
      * convention, a (strictly) positive pitch means that the camera is looking up.
-     * @return
+     * @return the pitch angle
      */
     public double getPitch() {
         return pitch;
     }
 
-    public static void main(String[] args) {
-        Camera cam = new Camera();
-        cam.setYaw(Math.toRadians(45));
-        cam.setPitch(Math.toRadians(30));
-        cam.calc();
-        Matrix point = new Matrix(4, 1, 2, 0, 0, 1);
+    /**
+     * Sets this camera's resolution.
+     * @param resx horizontal resolution
+     * @param resy vertical resolution
+     */
+    public void setResolution(int resx, int resy) {
+        this.resx = resx;
+        this.resy = resy;
+    }
 
-        Matrix result = cam.snap(point);
+    /**
+     * Converts the given 3D point in XYZ space into a 2D point in screen space.
+     * @param point the 3D point in XYZ space
+     * @return the 2D point in screen space
+     */
+    public Matrix snap(Matrix point) {
+        M3D.multiply(point);
+        Matrix proj = M3D.multiply(point);
 
-        System.out.println(result.toStringInt());
+        double reciprocal = 1 / (proj.get(2, 0) + 0);
+        Matrix F1 = CameraUtils.create3Dto2DMatrix(reciprocal);
+        return M2D.multiply(F1).multiply(proj);
     }
 }

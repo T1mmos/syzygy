@@ -6,7 +6,7 @@ public class ProjectionManager {
     private final Projection[] projections;
 
     public ProjectionManager() {
-        this.projections = new Projection[8];
+        this.projections = new Projection[16];
     }
 
     public void setProjection(int ref, Projection p) {

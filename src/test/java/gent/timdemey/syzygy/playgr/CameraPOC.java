@@ -5,13 +5,12 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -19,7 +18,7 @@ import javax.swing.WindowConstants;
 
 
 
-public class CameraTest {
+public class CameraPOC {
 
     private final VertexManager     vertexMan;
     private final PointManager      pointMan;
@@ -31,47 +30,21 @@ public class CameraTest {
 
     private final Camera            cam;
 
-    public CameraTest() {
+    public CameraPOC() {
         this.vertexMan = new VertexManager();
         this.lineMan = new LineManager();
         this.projMan = new ProjectionManager();
         this.pointMan = new PointManager();
 
         this.cam = new Camera();
-        this.cam.setFov(Math.toRadians(60));
+        this.cam.setFov(Math.toRadians(70));
         this.cam.recalc();
         this.pane = new _3DPane();
 
-        this.pane.addComponentListener(new ComponentListener() {
-
-            @Override
-            public void componentShown(ComponentEvent e) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                cam.setResolution(pane.getSize().width, pane.getSize().height);
-                cam.recalc();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void componentHidden(ComponentEvent e) {
-                // TODO Auto-generated method stub
-
-            }
-        });
     }
 
     public static void main(String[] args) {
-        final CameraTest test = new CameraTest();
+        final CameraPOC test = new CameraPOC();
         test.startUI();
     }
 
@@ -86,18 +59,46 @@ public class CameraTest {
     }
 
     private void doStartUI() {
-        JFrame frame = new JFrame ();
+        JFrame frame = new JFrame();
 
         Mouse mouse = new Mouse();
         pane.addMouseMotionListener(mouse);
         pane.addMouseListener(mouse);
-        pane.addMouseWheelListener(mouse);
 
         frame.setContentPane(pane);
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setVisible(true);
+
+        snap();
+
+        this.pane.addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                cam.setResolution(pane.getSize().width, pane.getSize().height);
+                cam.recalc();
+            }
+        });
+
+        frame.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (KeyEvent.VK_W == e.getKeyCode()) {
+                    cam.addPinhole(+0.25, 0, 0);
+                } else if (KeyEvent.VK_S == e.getKeyCode()) {
+                    cam.addPinhole(-0.25, 0, 0);
+                } else if (KeyEvent.VK_A == e.getKeyCode()) {
+                    cam.addPinhole(0, 0, -0.25);
+                } else if (KeyEvent.VK_D == e.getKeyCode()) {
+                    cam.addPinhole(0, 0, +0.25);
+                }
+                cam.recalc();
+                snap();
+            }
+        });
     }
 
     private void projectVertex(int vref) {
@@ -125,7 +126,7 @@ public class CameraTest {
     private void snap() {
         lineMan.clear();
         projMan.clear();
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < vertexMan.getCount(); i++) {
             projectVertex(i);
         }
         pane.repaint();
@@ -157,7 +158,7 @@ public class CameraTest {
 
         @Override
         public Dimension getPreferredSize() {
-            return new Dimension(400, 300);
+            return new Dimension(300, 200);
         }
     }
 
@@ -185,22 +186,6 @@ public class CameraTest {
 
             cam.addYaw(yaw);
             cam.addPitch(pitch);
-            cam.recalc();
-
-            snap();
-        }
-
-        @Override
-        public void mouseWheelMoved(MouseWheelEvent e) {
-            int cnt = e.getWheelRotation();
-            if ((e.getModifiers() & KeyEvent.CTRL_MASK) == 0) {
-                double x = cam.getPinhole().get(0, 0);
-                cam.getPinhole().set(0, 0, x - cnt * 0.25);
-            } else {
-                double y = cam.getPinhole().get(0, 1);
-                cam.getPinhole().set(0, 1, y - cnt * 0.25);
-            }
-
             cam.recalc();
 
             snap();
