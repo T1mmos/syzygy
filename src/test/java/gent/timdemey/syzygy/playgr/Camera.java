@@ -30,7 +30,7 @@ public class Camera {
     private static Matrix       C       = CameraUtils.createCarthMatrix();
 
     // FOV in radians
-    private double              fov     = Math.toRadians(90);
+    private double              fov     = Math.toRadians(75);
 
     // camera translation, so the point where the pinhole is.
     private Matrix              P       = Matrix.createVector(0, 0, 0);
@@ -40,7 +40,7 @@ public class Camera {
     private double              pitch   = 0;
 
     // resolution
-    private int resx = 300, resy = 200;
+    private int                 resx    = 300, resy = 200;
 
     // derived properties
     // translation 3D
@@ -94,8 +94,8 @@ public class Camera {
         // we take ||u|| = 1, then half the camera plane width in WHD equals tan(fov / 2) in XYZ
         double tanfov = Math.tan(fov / 2);
         double sx = 2 * tanfov / resx;
-        double sy = 2 * tanfov / resy;
-        S = CameraUtils.createScale(sx, sy);
+        // double sy = 2 * tanfov / resy;
+        S = CameraUtils.createScale(sx, sx);
 
         double px = P.get(0, 0);
         double py = P.get(1, 0);
@@ -124,8 +124,16 @@ public class Camera {
         this.yaw = rot;
     }
 
+    public void addYaw(double rot) {
+        this.yaw += rot;
+    }
+
     public void setPitch(double tilt) {
         this.pitch = tilt;
+    }
+
+    public void addPitch(double tilt) {
+        this.pitch += tilt;
     }
 
     // getters
@@ -137,7 +145,7 @@ public class Camera {
      * Gets the coordinates in XYZ space of the pinhole of this camera.
      * @return
      */
-    public Matrix getLocation() {
+    public Matrix getPinhole() {
         return P;
     }
 
@@ -150,11 +158,16 @@ public class Camera {
         return yaw;
     }
 
+    public void setResolution(int resx, int resy) {
+        this.resx = resx;
+        this.resy = resy;
+    }
+
     public Matrix snap(Matrix point) {
         V.multiply(Ry.multiply(Rp.multiply(T.multiply(point))));
         Matrix proj = M.multiply(point);
 
-        double reciprocal = 1 / proj.get(2, 0);
+        double reciprocal = 1 / (proj.get(2, 0) + 0);
         Matrix F1 = CameraUtils.create3Dto2DMatrix(reciprocal);
         return C.multiply(S2D.multiply(T2D.multiply(S.multiply(F1.multiply(proj)))));
     }
@@ -170,13 +183,13 @@ public class Camera {
 
     public static void main(String[] args) {
         Camera cam = new Camera();
-        cam.setYaw(Math.toRadians(90+45));
-        cam.setPitch(Math.toRadians(45));
+        cam.setYaw(Math.toRadians(45));
+        cam.setPitch(Math.toRadians(30));
         cam.calc();
-        Matrix point = new Matrix(4, 1, 0, 0, -3, 1);
+        Matrix point = new Matrix(4, 1, 2, 0, 0, 1);
 
         Matrix result = cam.snap(point);
-        
+
         System.out.println(result.toStringInt());
     }
 }
