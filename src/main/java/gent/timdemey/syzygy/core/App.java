@@ -1,7 +1,5 @@
 package gent.timdemey.syzygy.core;
 
-import gent.timdemey.syzygy.raycast._RaycastingEngine;
-
 import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -14,6 +12,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+
+import gent.timdemey.syzygy.engine._3DEngine;
 
 /**
  * Main entrypoint.
@@ -51,7 +51,7 @@ public class App implements Runnable {
         frame.pack();
         frame.setLocation(0, 0);
 
-        Engine engine = new _RaycastingEngine();
+        Engine engine = new _3DEngine();
         InnerEngine inner = new InnerEngine(canvas, strategy, engine);
         inner.start();
     }

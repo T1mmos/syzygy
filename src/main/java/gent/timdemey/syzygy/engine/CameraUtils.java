@@ -1,4 +1,4 @@
-package gent.timdemey.syzygy.playgr;
+package gent.timdemey.syzygy.engine;
 
 /**
  * Utility operations for a {@link Camera}. For each transformation, the matrix returned is the
@@ -8,7 +8,7 @@ package gent.timdemey.syzygy.playgr;
  * each point with (-tx, -ty) while keeping the current axis system fixed.
  * @author Timmos
  */
-public class CameraUtils {
+public final class CameraUtils {
 
     /**
      * Creates a camera pitch transformation matrix given the angle. The returned matrix is conform

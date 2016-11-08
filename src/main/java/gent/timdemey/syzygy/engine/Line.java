@@ -1,4 +1,4 @@
-package gent.timdemey.syzygy.playgr;
+package gent.timdemey.syzygy.engine;
 
 
 public class Line {

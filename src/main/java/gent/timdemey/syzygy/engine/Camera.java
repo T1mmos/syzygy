@@ -1,4 +1,4 @@
-package gent.timdemey.syzygy.playgr;
+package gent.timdemey.syzygy.engine;
 
 /**
  * A camera, converting points in XYZ space into WHD space (Width-Height-Depth). The
@@ -41,12 +41,18 @@ public final class Camera {
     private static final double FOV_MIN   = RAD_60;
     private static final double FOV_MAX   = RAD_90;
 
+    // unit vector X
     private static final Matrix UX        = new Matrix(4, 1, 1, 0, 0, 1);
+    // unit vector Y
     private static final Matrix UY        = new Matrix(4, 1, 0, 1, 0, 1);
+    // unit vector Z
     private static final Matrix UZ        = new Matrix(4, 1, 0, 0, 1, 1);
 
+    // unit vector X after yaw and pitch
     private Matrix              RX        = null;
+    // unit vector Y after yaw and pitch
     private Matrix              RY        = null;
+    // unit vector Z after yaw and pitch
     private Matrix              RZ        = null;
 
     // FOV in radians
@@ -120,9 +126,13 @@ public final class Camera {
         // S2D = CameraUtils.createScale(1, -1);
         M2D = C.multiply(O).multiply(S); // .multiply(S2D)
 
-        RX = P.multiply(Y).multiply(UX);
-        RY = P.multiply(Y).multiply(UY);
-        RZ = P.multiply(Y).multiply(UZ);
+        // now express in XYZ space the unit vectors after rotations
+        Matrix camY = VectorUtils.createYaw(yaw);
+        Matrix camP = VectorUtils.createPitch(pitch);
+        Matrix comb = camY.multiply(camP);        
+        RX = comb.multiply(UX);
+        RY = comb.multiply(UY);
+        RZ = comb.multiply(UZ);
     }
 
     /**

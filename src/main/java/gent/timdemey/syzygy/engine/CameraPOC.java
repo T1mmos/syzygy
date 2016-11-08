@@ -1,4 +1,4 @@
-package gent.timdemey.syzygy.playgr;
+package gent.timdemey.syzygy.engine;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -87,22 +87,21 @@ public class CameraPOC {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                double dx = 0.1 * cam.getD().get(0, 0);
-                double dy = 0.1 * cam.getD().get(1, 0);
-                double dz = 0.1 * cam.getD().get(2, 0);
-                double wx = 0.1 * cam.getW().get(0, 0);
-                double wy = 0.1 * cam.getW().get(1, 0);
-                double wz = 0.1 * cam.getW().get(2, 0);
+                double dx =cam.getD().get(0, 0);
+                double dy = cam.getD().get(1, 0);
+                double dz = cam.getD().get(2, 0);
+                double wx = cam.getW().get(0, 0);
+                double wy = cam.getW().get(1, 0);
+                double wz = cam.getW().get(2, 0);
 
                 if (KeyEvent.VK_W == e.getKeyCode()) {
-
-                    cam.addPinhole(dx, dy, -dz);
+                    cam.addPinhole(0.1*dx, +0.1*dy, +0.1*dz);
                 } else if (KeyEvent.VK_S == e.getKeyCode()) {
-                    cam.addPinhole(-dx, -dy, +dz);
+                    cam.addPinhole(-0.1*dx, -0.1*dy, -0.1*dz);
                 } else if (KeyEvent.VK_A == e.getKeyCode()) {
-                    cam.addPinhole(wx, wy, -wz);
+                    cam.addPinhole(-0.1*wx, 0, -0.1*wz);
                 } else if (KeyEvent.VK_D == e.getKeyCode()) {
-                    cam.addPinhole(-wx, -wy, +wz);
+                    cam.addPinhole(0.1*wx, 0, +0.1*wz);
                 } else if (KeyEvent.VK_SPACE == e.getKeyCode()) {
                     cam.addPinhole(0, +0.25, 0);
                 } else if (KeyEvent.VK_SHIFT == e.getKeyCode()) {
