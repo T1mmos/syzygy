@@ -87,14 +87,22 @@ public class CameraPOC {
 
             @Override
             public void keyPressed(KeyEvent e) {
+                double dx = 0.1 * cam.getD().get(0, 0);
+                double dy = 0.1 * cam.getD().get(1, 0);
+                double dz = 0.1 * cam.getD().get(2, 0);
+                double wx = 0.1 * cam.getW().get(0, 0);
+                double wy = 0.1 * cam.getW().get(1, 0);
+                double wz = 0.1 * cam.getW().get(2, 0);
+
                 if (KeyEvent.VK_W == e.getKeyCode()) {
-                    cam.addPinhole(+0.25, 0, 0);
+
+                    cam.addPinhole(dx, dy, -dz);
                 } else if (KeyEvent.VK_S == e.getKeyCode()) {
-                    cam.addPinhole(-0.25, 0, 0);
+                    cam.addPinhole(-dx, -dy, +dz);
                 } else if (KeyEvent.VK_A == e.getKeyCode()) {
-                    cam.addPinhole(0, 0, -0.25);
+                    cam.addPinhole(wx, wy, -wz);
                 } else if (KeyEvent.VK_D == e.getKeyCode()) {
-                    cam.addPinhole(0, 0, +0.25);
+                    cam.addPinhole(-wx, -wy, +wz);
                 } else if (KeyEvent.VK_SPACE == e.getKeyCode()) {
                     cam.addPinhole(0, +0.25, 0);
                 } else if (KeyEvent.VK_SHIFT == e.getKeyCode()) {

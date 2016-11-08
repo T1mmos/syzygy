@@ -6,7 +6,7 @@ public class VertexManager {
     private final Vertex[] vertices;
 
     public VertexManager() {
-        this.vertices = new Vertex[24];
+        this.vertices = new Vertex[27];
 
         // cube (12 vertices)
 
@@ -44,6 +44,11 @@ public class VertexManager {
         vertices[21] = new Vertex(9, 13);
         vertices[22] = new Vertex(10, 14);
         vertices[23] = new Vertex(11, 15);
+
+        // axis!
+        vertices[24] = new Vertex(16, 17);
+        vertices[25] = new Vertex(16, 18);
+        vertices[26] = new Vertex(16, 19);
 
     }
 

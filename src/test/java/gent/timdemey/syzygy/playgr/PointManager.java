@@ -6,7 +6,7 @@ public class PointManager {
     private final Matrix[] points;
 
     public PointManager() {
-        this.points = new Matrix[16];
+        this.points = new Matrix[20];
 
         // cube
         points[0] = new Matrix(4, 1, 4.0, -1.0, -1, 1);
@@ -26,6 +26,11 @@ public class PointManager {
         points[13] = new Matrix(4, 1, 4.0, 5.0, +1, 1);
         points[14] = new Matrix(4, 1, 6.0, 5.0, -1, 1);
         points[15] = new Matrix(4, 1, 6.0, 5.0, +1, 1);
+
+        points[16] = new Matrix(4, 1, 0, 0, 0, 1);
+        points[17] = new Matrix(4, 1, 1, 0, 0, 1);
+        points[18] = new Matrix(4, 1, 0, 1, 0, 1);
+        points[19] = new Matrix(4, 1, 0, 0, 1, 1);
     }
 
     public Matrix get(int nr) {

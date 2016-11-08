@@ -7,7 +7,7 @@ public class LineManager {
     private int          cnt;
 
     public LineManager() {
-        this.lines = new Line[24];
+        this.lines = new Line[27];
     }
 
     public void addLine(int ref, Line line) {

@@ -41,7 +41,13 @@ public final class Camera {
     private static final double FOV_MIN   = RAD_60;
     private static final double FOV_MAX   = RAD_90;
 
+    private static final Matrix UX        = new Matrix(4, 1, 1, 0, 0, 1);
+    private static final Matrix UY        = new Matrix(4, 1, 0, 1, 0, 1);
+    private static final Matrix UZ        = new Matrix(4, 1, 0, 0, 1, 1);
 
+    private Matrix              RX        = null;
+    private Matrix              RY        = null;
+    private Matrix              RZ        = null;
 
     // FOV in radians
     private double              fov       = RAD_60;
@@ -113,6 +119,10 @@ public final class Camera {
         O = CameraUtils.createTranslation(-resx / 2, -resy / 2);
         // S2D = CameraUtils.createScale(1, -1);
         M2D = C.multiply(O).multiply(S); // .multiply(S2D)
+
+        RX = P.multiply(Y).multiply(UX);
+        RY = P.multiply(Y).multiply(UY);
+        RZ = P.multiply(Y).multiply(UZ);
     }
 
     /**
@@ -208,7 +218,7 @@ public final class Camera {
     }
 
     /**
-     * Gets the yaw angle. According to the right-hand axis
+     * Gets the yaw angle in XYZ space. According to the right-hand axis
      * convention, a positive yaw means that the camera rotated to the left.
      * @return the yaw angle
      */
@@ -217,12 +227,30 @@ public final class Camera {
     }
 
     /**
-     * Gets the pitch angle. According to the right-hand axis
+     * Gets the pitch angle in XYZ space. According to the right-hand axis
      * convention, a (strictly) positive pitch means that the camera is looking up.
      * @return the pitch angle
      */
     public double getPitch() {
         return pitch;
+    }
+
+    /**
+     * Gets the Z axis unit vector after applying yaw and pitch in XYZ space. This is useful to step sideways as this
+     * is the horizontal direction vector perpendicular to the view direction.
+     * @return
+     */
+    public Matrix getW() {
+        return RZ;
+    }
+
+    /**
+     * Gets the X axis unit vector after applying yaw and pitch in XYZ space. This is useful to step forwards /
+     * backwards as this is the view direction.
+     * @return
+     */
+    public Matrix getD() {
+        return RX;
     }
 
     /**
